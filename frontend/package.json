@@ -13,10 +13,17 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@dynamic-labs/ethereum": "^3.8.4",
+    "@dynamic-labs/sdk-react-core": "^3.8.4",
+    "@dynamic-labs/solana": "^3.8.4",
+    "@dynamic-labs/wagmi-connector": "^3.8.4",
+    "@tanstack/react-query": "^5.61.5",
     "next": "15.0.3",
     "next-pwa": "^5.6.0",
     "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "viem": "^2.21.52",
+    "wagmi": "^2.13.2"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -24,22 +31,20 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
+    "pino-pretty": "^13.0.0",
     "postcss": "^8",
     "prettier": "^3.4.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
-  "prettier/prettier": [
-    "error",
-    {
-      "singleQuote": true,
-      "trailingComma": "none",
-      "semi": false,
-      "useTabs": false,
-      "tabWidth": 2,
-      "bracketSpacing": true,
-      "bracketSameLine": false,
-      "arrowParens": "always"
-    }
-  ]
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "none",
+    "semi": false,
+    "useTabs": false,
+    "tabWidth": 2,
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "always"
+  }
 }
