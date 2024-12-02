@@ -1,8 +1,8 @@
 'use client'
-import { DynamicWidget } from '@dynamic-labs/sdk-react-core'
 import { useLayoutEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-import Hall from '@/components/hall'
+import Staking from '@/app/get-start/components/staking'
+import Link from 'next/link'
 
 export default function Home() {
   const account = useAccount()
@@ -16,8 +16,8 @@ export default function Home() {
   }, [account.status])
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-skyblue1 via-skyblue2 to-skyblue3">
-      {isLogin ? <Hall /> : <DynamicWidget />}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-tr from-white via-offwhite to-yellow-100">
+      {isLogin ? <Staking /> : <Link href="/">Back to login or signup</Link>}
     </div>
   )
 }
