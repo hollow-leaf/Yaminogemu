@@ -21,4 +21,6 @@ pub struct MemeRatio {
 #[derive(InitSpace)]
 pub struct OwnerCap {
     pub owner: Pubkey,
+    pub mint_bonk: Pubkey,
+    pub bump: u8,
 }

@@ -9,14 +9,23 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("DEzojzrGnQ7x2ZoFdSBZV52yF8FZRrouVJhqXoXRvvnz");
+declare_id!("883NJTQP8WQpME36TEuEkZNFHJ1qok5WsyoZ7mKKyw34");
 
 #[program]
 pub mod tbw_yaminogemu {
+
     use super::*;
 
     pub fn init(ctx: Context<Init>) -> Result<()> {
-        ctx.accounts.init()
+        ctx.accounts.init(&ctx.bumps)
+    }
+
+    pub fn deposit(ctx: Context<Init>, bonk_amount: u64) -> Result<()> {
+        ctx.accounts.deposit(bonk_amount)
+    }
+
+    pub fn withdraw(ctx: Context<Init>, bonk_amount: u64) -> Result<()> {
+        ctx.accounts.withdraw(bonk_amount)
     }
 
     pub fn add(ctx: Context<Add>, amount: u64) -> Result<()> {
@@ -37,5 +46,9 @@ pub mod tbw_yaminogemu {
 
     pub fn finalize(ctx: Context<Finalize>) -> Result<()> {
         ctx.accounts.send_and_close_vault()
+    }
+
+    pub fn claim(ctx: Context<Claim>) -> Result<()> {
+        ctx.accounts.claim_and_close_vault()
     }
 }

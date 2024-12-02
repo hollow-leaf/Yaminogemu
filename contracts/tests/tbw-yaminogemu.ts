@@ -51,13 +51,13 @@ describe("tbw_yaminogemu", () => {
 
   const task_id = new BN(randomBytes(8));
 
-  const [maker, taker, mintA, mintB] = Array.from({ length: 4 }, () =>
+  const [maker, taker, mintA, mintB, mintBonk] = Array.from({ length: 5 }, () =>
     Keypair.generate()
   );
 
-  const [makerAtaA, makerAtaB, takerAtaA, takerAtaB] = [maker, taker]
+  const [makerAtaA, makerAtaB, makerAtaBonk, takerAtaA, takerAtaB, takerAtaBonk] = [maker, taker]
     .map((a) =>
-      [mintA, mintB].map((m) =>
+      [mintA, mintB, mintBonk].map((m) =>
         getAssociatedTokenAddressSync(m.publicKey, a.publicKey, false, tokenProgram)
       )
     )
@@ -85,24 +85,26 @@ describe("tbw_yaminogemu", () => {
 
   const vaultA = getAssociatedTokenAddressSync(mintA.publicKey, escrow, true, tokenProgram);
   const vaultB = getAssociatedTokenAddressSync(mintB.publicKey, escrow, true, tokenProgram);
+  const ownershipBonk = getAssociatedTokenAddressSync(mintBonk.publicKey, ownership, true, tokenProgram);
   // Accounts
-  const accounts = {
-    owner: maker.publicKey,
-    maker: maker.publicKey,
-    taker: taker.publicKey,
-    mintA: mintA.publicKey,
-    mintB: mintB.publicKey,
-    memeRatioA,
-    memeRatioB,
-    makerAtaA,
-    makerAtaB,
-    takerAtaA,
-    takerAtaB,
-    escrow,
-    vaultA,
-    vaultB,
-    tokenProgram,
-  }
+  // const accounts = {
+  //   owner: maker.publicKey,
+  //   maker: maker.publicKey,
+  //   taker: taker.publicKey,
+  //   mintA: mintA.publicKey,
+  //   mintB: mintB.publicKey,
+  //   mintBonk: mintBonk.publicKey,
+  //   memeRatioA,
+  //   memeRatioB,
+  //   makerAtaA,
+  //   makerAtaB,
+  //   takerAtaA,
+  //   takerAtaB,
+  //   escrow,
+  //   vaultA,
+  //   vaultB,
+  //   tokenProgram,
+  // }
 
   it("Airdrop and create mints", async () => {
     let lamports = await getMinimumBalanceForRentExemptMint(connection);
@@ -112,7 +114,7 @@ describe("tbw_yaminogemu", () => {
         SystemProgram.transfer({
           fromPubkey: provider.publicKey,
           toPubkey: account.publicKey,
-          lamports: 0.01 * LAMPORTS_PER_SOL,
+          lamports: 0.04 * LAMPORTS_PER_SOL,
         })
       ),
       ...[mintA, mintB].map((mint) =>
@@ -138,12 +140,73 @@ describe("tbw_yaminogemu", () => {
     await provider.sendAndConfirm(tx, [mintA, mintB, maker, taker]).then(log);
   });
 
+  it("Airdrop Bonk", async () => {
+    let lamports = await getMinimumBalanceForRentExemptMint(connection);
+    let tx = new Transaction();
+    tx.instructions = [
+      SystemProgram.createAccount({
+        fromPubkey: provider.publicKey,
+        newAccountPubkey: mintBonk.publicKey,
+        lamports,
+        space: MINT_SIZE,
+        programId: tokenProgram,
+      }),
+      createInitializeMint2Instruction(mintBonk.publicKey, 6, maker.publicKey, null, tokenProgram),
+      createAssociatedTokenAccountIdempotentInstruction(provider.publicKey,  makerAtaBonk, maker.publicKey, mintBonk.publicKey, tokenProgram),
+      createMintToInstruction(mintBonk.publicKey, makerAtaBonk, maker.publicKey, 10e9, undefined, tokenProgram),
+    ];
+
+    await provider.sendAndConfirm(tx, [mintBonk, maker]).then(log);
+  });
+
   it("Init", async () => {
     await program.methods
       .init()
       .accountsStrict({
         owner: maker.publicKey,
         ownership,
+        mintBonk: mintBonk.publicKey,
+        ownerAtaBonk: makerAtaBonk,
+        ownershipBonk,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([maker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+  });
+
+  it("Deposit", async () => {
+    await program.methods
+      .deposit(new BN(1e10))
+      .accountsStrict({
+        owner: maker.publicKey,
+        ownership,
+        mintBonk: mintBonk.publicKey,
+        ownerAtaBonk: makerAtaBonk,
+        ownershipBonk,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([maker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+  });
+
+  it("Withdraw", async () => {
+    await program.methods
+      .withdraw(new BN(1e8))
+      .accountsStrict({
+        owner: maker.publicKey,
+        ownership,
+        mintBonk: mintBonk.publicKey,
+        ownerAtaBonk: makerAtaBonk,
+        ownershipBonk,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
@@ -259,18 +322,46 @@ describe("tbw_yaminogemu", () => {
       .accountsStrict({ 
         winner: taker.publicKey,
         maker: maker.publicKey,
+        owner: maker.publicKey,
+        mintBonk: mintBonk.publicKey,
         mintWin: mintB.publicKey,
-        mintLose: mintA.publicKey,
         winnerAtaWin: takerAtaB,
-        winnerAtaLose: takerAtaA,
+        winnerAtaBonk: takerAtaBonk,
+        ownership,
         escrow,
         vaultWin: vaultB,
-        vaultLose: vaultA,
+        ownershipBonk,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
       .signers([taker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+    } catch(e) {
+      console.log(e);
+      throw(e)
+    }
+  });
+
+  it("Claim", async () => {
+    try {
+    await program.methods
+      .claim()
+      .accountsStrict({ 
+        maker: maker.publicKey,
+        owner: maker.publicKey,
+        mintLose: mintA.publicKey,
+        ownerAtaLose: makerAtaA,
+        ownership,
+        escrow,
+        vaultLose: vaultA,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([maker])
       .rpc()
       .then(confirm)
       .then(log);

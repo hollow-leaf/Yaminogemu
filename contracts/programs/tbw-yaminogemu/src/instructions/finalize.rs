@@ -7,6 +7,7 @@ use anchor_spl::{
 
 use crate::Escrow;
 use crate::error::ErrorCode;
+use crate::OwnerCap;
 
 #[derive(Accounts)]
 pub struct Finalize<'info> {
@@ -14,8 +15,10 @@ pub struct Finalize<'info> {
     pub winner: Signer<'info>,
     #[account(mut)]
     pub maker: SystemAccount<'info>,
+    #[account(mut)]
+    pub owner: SystemAccount<'info>,
+    pub mint_bonk: InterfaceAccount<'info, Mint>,
     pub mint_win: InterfaceAccount<'info, Mint>,
-    pub mint_lose: InterfaceAccount<'info, Mint>,
     #[account(
         mut,
         associated_token::mint = mint_win,
@@ -26,33 +29,37 @@ pub struct Finalize<'info> {
     #[account(
         init_if_needed,
         payer = winner,
-        associated_token::mint = mint_lose,
+        associated_token::mint = mint_bonk,
         associated_token::authority = winner,
         associated_token::token_program = token_program,
     )]
-    pub winner_ata_lose: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub winner_ata_bonk: Box<InterfaceAccount<'info, TokenAccount>>,
+    #[account(
+        seeds = [b"tbw_yaminogemu"],
+        bump
+    )]
+    pub ownership: Box<Account<'info, OwnerCap>>,
     #[account(
         mut,
-        close = winner,
         has_one = maker,
         seeds = [b"escrow", maker.key().as_ref(), escrow.task_id.to_le_bytes().as_ref()],
         bump = escrow.bump
     )]
-    escrow: Box<Account<'info, Escrow>>,
+    pub escrow: Box<Account<'info, Escrow>>,
     #[account(
         mut,
         associated_token::mint = mint_win,
         associated_token::authority = escrow,
         associated_token::token_program = token_program,
     )]
-    pub vault_win: InterfaceAccount<'info, TokenAccount>,
+    pub vault_win: Box<InterfaceAccount<'info, TokenAccount>>,
     #[account(
         mut,
-        associated_token::mint = mint_lose,
-        associated_token::authority = escrow,
+        associated_token::mint = mint_bonk,
+        associated_token::authority = ownership,
         associated_token::token_program = token_program,
     )]
-    pub vault_lose: InterfaceAccount<'info, TokenAccount>,
+    pub ownership_bonk: Box<InterfaceAccount<'info, TokenAccount>>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
@@ -61,7 +68,7 @@ pub struct Finalize<'info> {
 impl Finalize<'_> {
     pub fn send_and_close_vault(&mut self) -> Result<()> {
         require!(self.escrow.filled, ErrorCode::NotFilledError);
-        let signer_seeds: [&[&[u8]]; 1] = [&[
+        let vault_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",
             self.maker.to_account_info().key.as_ref(),
             &self.escrow.task_id.to_le_bytes()[..],
@@ -78,25 +85,30 @@ impl Finalize<'_> {
         let ctx_a = CpiContext::new_with_signer(
             self.token_program.to_account_info(),
             accounts_a,
-            &signer_seeds,
+            &vault_seeds,
         );
 
         transfer_checked(ctx_a, self.vault_win.amount, self.mint_win.decimals)?;
+        
+        let ownership_seeds: [&[&[u8]]; 1] = [&[
+            b"tbw_yaminogemu",
+            &[self.ownership.bump],
+        ]];
 
-        let accounts_b = TransferChecked {
-            from: self.vault_lose.to_account_info(),
-            mint: self.mint_lose.to_account_info(),
-            to: self.winner_ata_lose.to_account_info(),
-            authority: self.escrow.to_account_info(),
+        let accounts_bonk = TransferChecked {
+            from: self.ownership_bonk.to_account_info(),
+            mint: self.mint_bonk.to_account_info(),
+            to: self.winner_ata_bonk.to_account_info(),
+            authority: self.ownership.to_account_info(),
         };
 
-        let ctx_b = CpiContext::new_with_signer(
+        let ctx_bonk = CpiContext::new_with_signer(
             self.token_program.to_account_info(),
-            accounts_b,
-            &signer_seeds,
+            accounts_bonk,
+            &ownership_seeds,
         );
 
-        transfer_checked(ctx_b, self.vault_lose.amount, self.mint_lose.decimals)?;
+        transfer_checked(ctx_bonk, self.escrow.bonk_amount, self.mint_bonk.decimals)?;
 
         let accounts_win = CloseAccount {
             account: self.vault_win.to_account_info(),
@@ -107,23 +119,9 @@ impl Finalize<'_> {
         let ctx_win = CpiContext::new_with_signer(
             self.token_program.to_account_info(),
             accounts_win,
-            &signer_seeds,
+            &vault_seeds,
         );
 
-        close_account(ctx_win)?;
-
-        let accounts_lose = CloseAccount {
-            account: self.vault_lose.to_account_info(),
-            destination: self.winner.to_account_info(),
-            authority: self.escrow.to_account_info(),
-        };
-
-        let ctx_lose = CpiContext::new_with_signer(
-            self.token_program.to_account_info(),
-            accounts_lose,
-            &signer_seeds,
-        );
-
-        close_account(ctx_lose)
+        close_account(ctx_win)
     }
 }
