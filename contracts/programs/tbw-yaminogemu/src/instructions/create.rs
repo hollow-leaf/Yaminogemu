@@ -16,16 +16,16 @@ pub struct Create<'info> {
     #[account(
         mint::token_program = token_program
     )]
-    pub mint_a: InterfaceAccount<'info, Mint>,
+    pub mint_m: InterfaceAccount<'info, Mint>,
     #[account(
         mut,
-        associated_token::mint = mint_a,
+        associated_token::mint = mint_m,
         associated_token::authority = maker,
         associated_token::token_program = token_program
     )]
-    pub maker_ata_a: InterfaceAccount<'info, TokenAccount>,
+    pub maker_ata_m: InterfaceAccount<'info, TokenAccount>,
     #[account(
-        seeds = [b"meme", mint_a.key().as_ref()],
+        seeds = [b"meme", mint_m.key().as_ref()],
         bump
     )]
     pub meme_ratio: Account<'info, MemeRatio>,
@@ -40,11 +40,11 @@ pub struct Create<'info> {
     #[account(
         init,
         payer = maker,
-        associated_token::mint = mint_a,
+        associated_token::mint = mint_m,
         associated_token::authority = escrow,
         associated_token::token_program = token_program
     )]
-    pub vault_a: InterfaceAccount<'info, TokenAccount>,
+    pub vault_m: InterfaceAccount<'info, TokenAccount>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
@@ -55,21 +55,21 @@ impl Create<'_> {
         self.escrow.set_inner(Escrow {
             task_id,
             maker: self.maker.key(),
-            mint_a: self.mint_a.key(),
+            mint_m: self.mint_m.key(),
             bonk_amount,
             filled: false,
             bump: bumps.escrow,
         });
         let amount = bonk_amount * self.meme_ratio.amount;
         let transfer_accounts = TransferChecked {
-            from: self.maker_ata_a.to_account_info(),
-            mint: self.mint_a.to_account_info(),
-            to: self.vault_a.to_account_info(),
+            from: self.maker_ata_m.to_account_info(),
+            mint: self.mint_m.to_account_info(),
+            to: self.vault_m.to_account_info(),
             authority: self.maker.to_account_info(),
         };
 
         let cpi_ctx = CpiContext::new(self.token_program.to_account_info(), transfer_accounts);
 
-        transfer_checked(cpi_ctx, amount, self.mint_a.decimals)
+        transfer_checked(cpi_ctx, amount, self.mint_m.decimals)
     }
 }

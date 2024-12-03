@@ -21,7 +21,7 @@ pub struct Take<'info> {
         associated_token::authority = taker,
         associated_token::token_program = token_program,
     )]
-    pub taker_ata_b: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub taker_ata_t: Box<InterfaceAccount<'info, TokenAccount>>,
     #[account(
         has_one = mint_meme,
         seeds = [b"meme", mint_meme.key().as_ref()],
@@ -42,7 +42,7 @@ pub struct Take<'info> {
         associated_token::authority = escrow,
         associated_token::token_program = token_program,
     )]
-    pub vault_b: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub vault_t: Box<InterfaceAccount<'info, TokenAccount>>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
@@ -52,9 +52,9 @@ impl Take<'_> {
     pub fn deposit(&mut self) -> Result<()> {
         let amount = self.escrow.bonk_amount * self.meme_ratio.amount;
         let transfer_accounts = TransferChecked {
-            from: self.taker_ata_b.to_account_info(),
+            from: self.taker_ata_t.to_account_info(),
             mint: self.mint_meme.to_account_info(),
-            to: self.vault_b.to_account_info(),
+            to: self.vault_t.to_account_info(),
             authority: self.taker.to_account_info(),
         };
 

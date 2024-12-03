@@ -14,18 +14,18 @@ use crate::error::ErrorCode;
 pub struct Refund<'info> {
     #[account(mut)]
     maker: Signer<'info>,
-    mint_a: InterfaceAccount<'info, Mint>,
+    mint_m: InterfaceAccount<'info, Mint>,
     #[account(
         mut,
-        associated_token::mint = mint_a,
+        associated_token::mint = mint_m,
         associated_token::authority = maker,
         associated_token::token_program = token_program
     )]
-    maker_ata_a: InterfaceAccount<'info, TokenAccount>,
+    maker_ata_m: InterfaceAccount<'info, TokenAccount>,
     #[account(
         mut,
         close = maker,
-        has_one = mint_a,
+        has_one = mint_m,
         has_one = maker,
         seeds = [b"escrow", maker.key().as_ref(), escrow.task_id.to_le_bytes().as_ref()],
         bump = escrow.bump
@@ -33,11 +33,11 @@ pub struct Refund<'info> {
     escrow: Account<'info, Escrow>,
     #[account(
         mut,
-        associated_token::mint = mint_a,
+        associated_token::mint = mint_m,
         associated_token::authority = escrow,
         associated_token::token_program = token_program
     )]
-    pub vault_a: InterfaceAccount<'info, TokenAccount>,
+    pub vault_m: InterfaceAccount<'info, TokenAccount>,
     associated_token_program: Program<'info, AssociatedToken>,
     token_program: Interface<'info, TokenInterface>,
     system_program: Program<'info, System>,
@@ -54,9 +54,9 @@ impl Refund<'_> {
         ]];
 
         let xfer_accounts = TransferChecked {
-            from: self.vault_a.to_account_info(),
-            mint: self.mint_a.to_account_info(),
-            to: self.maker_ata_a.to_account_info(),
+            from: self.vault_m.to_account_info(),
+            mint: self.mint_m.to_account_info(),
+            to: self.maker_ata_m.to_account_info(),
             authority: self.escrow.to_account_info(),
         };
 
@@ -66,10 +66,10 @@ impl Refund<'_> {
             &signer_seeds,
         );
 
-        transfer_checked(ctx, self.vault_a.amount, self.mint_a.decimals)?;
+        transfer_checked(ctx, self.vault_m.amount, self.mint_m.decimals)?;
 
         let close_accounts = CloseAccount {
-            account: self.vault_a.to_account_info(),
+            account: self.vault_m.to_account_info(),
             destination: self.maker.to_account_info(),
             authority: self.escrow.to_account_info(),
         };

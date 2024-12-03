@@ -51,13 +51,13 @@ describe("tbw_yaminogemu", () => {
 
   const task_id = new BN(randomBytes(8));
 
-  const [maker, taker, mintA, mintB, mintBonk] = Array.from({ length: 5 }, () =>
+  const [maker, taker, mintM, mintT, mintBonk] = Array.from({ length: 5 }, () =>
     Keypair.generate()
   );
 
-  const [makerAtaA, makerAtaB, makerAtaBonk, takerAtaA, takerAtaB, takerAtaBonk] = [maker, taker]
+  const [makerAtaM, makerAtaT, makerAtaBonk, takerAtaM, takerAtaT, takerAtaBonk] = [maker, taker]
     .map((a) =>
-      [mintA, mintB, mintBonk].map((m) =>
+      [mintM, mintT, mintBonk].map((m) =>
         getAssociatedTokenAddressSync(m.publicKey, a.publicKey, false, tokenProgram)
       )
     )
@@ -74,35 +74,35 @@ describe("tbw_yaminogemu", () => {
   )[0];
 
   const memeRatioA = PublicKey.findProgramAddressSync(
-    [Buffer.from("meme"), mintA.publicKey.toBuffer()],
+    [Buffer.from("meme"), mintM.publicKey.toBuffer()],
     program.programId
   )[0];
 
   const memeRatioB = PublicKey.findProgramAddressSync(
-    [Buffer.from("meme"), mintB.publicKey.toBuffer()],
+    [Buffer.from("meme"), mintT.publicKey.toBuffer()],
     program.programId
   )[0];
 
-  const vaultA = getAssociatedTokenAddressSync(mintA.publicKey, escrow, true, tokenProgram);
-  const vaultB = getAssociatedTokenAddressSync(mintB.publicKey, escrow, true, tokenProgram);
+  const vaultM = getAssociatedTokenAddressSync(mintM.publicKey, escrow, true, tokenProgram);
+  const vaultT = getAssociatedTokenAddressSync(mintT.publicKey, escrow, true, tokenProgram);
   const ownershipBonk = getAssociatedTokenAddressSync(mintBonk.publicKey, ownership, true, tokenProgram);
   // Accounts
   // const accounts = {
   //   owner: maker.publicKey,
   //   maker: maker.publicKey,
   //   taker: taker.publicKey,
-  //   mintA: mintA.publicKey,
-  //   mintB: mintB.publicKey,
+  //   mintM: mintM.publicKey,
+  //   mintT: mintT.publicKey,
   //   mintBonk: mintBonk.publicKey,
   //   memeRatioA,
   //   memeRatioB,
-  //   makerAtaA,
-  //   makerAtaB,
-  //   takerAtaA,
-  //   takerAtaB,
+  //   makerAtaM,
+  //   makerAtaT,
+  //   takerAtaM,
+  //   takerAtaT,
   //   escrow,
-  //   vaultA,
-  //   vaultB,
+  //   vaultM,
+  //   vaultT,
   //   tokenProgram,
   // }
 
@@ -117,7 +117,7 @@ describe("tbw_yaminogemu", () => {
           lamports: 0.04 * LAMPORTS_PER_SOL,
         })
       ),
-      ...[mintA, mintB].map((mint) =>
+      ...[mintM, mintT].map((mint) =>
         SystemProgram.createAccount({
           fromPubkey: provider.publicKey,
           newAccountPubkey: mint.publicKey,
@@ -127,8 +127,8 @@ describe("tbw_yaminogemu", () => {
         })
       ),
       ...[
-        { mint: mintA.publicKey, authority: maker.publicKey, ata: makerAtaA },
-        { mint: mintB.publicKey, authority: taker.publicKey, ata: takerAtaB },
+        { mint: mintM.publicKey, authority: maker.publicKey, ata: makerAtaM },
+        { mint: mintT.publicKey, authority: taker.publicKey, ata: takerAtaT },
       ]
       .flatMap((x) => [
         createInitializeMint2Instruction(x.mint, 6, x.authority, null, tokenProgram),
@@ -137,7 +137,7 @@ describe("tbw_yaminogemu", () => {
       ])
     ];
 
-    await provider.sendAndConfirm(tx, [mintA, mintB, maker, taker]).then(log);
+    await provider.sendAndConfirm(tx, [mintM, mintT, maker, taker]).then(log);
   });
 
   it("Airdrop Bonk", async () => {
@@ -221,7 +221,7 @@ describe("tbw_yaminogemu", () => {
       .add(new BN(3))
       .accountsStrict({
         owner: maker.publicKey,
-        mintMeme: mintA.publicKey,
+        mintMeme: mintM.publicKey,
         ownership,
         memeRatio: memeRatioA,
         tokenProgram,
@@ -238,7 +238,7 @@ describe("tbw_yaminogemu", () => {
       .add(new BN(2))
       .accountsStrict({
         owner: maker.publicKey,
-        mintMeme: mintB.publicKey,
+        mintMeme: mintT.publicKey,
         ownership,
         memeRatio: memeRatioB,
         tokenProgram,
@@ -255,11 +255,11 @@ describe("tbw_yaminogemu", () => {
       .create(task_id, new BN(1e6))
       .accountsStrict({
         maker: maker.publicKey,
-        mintA: mintA.publicKey,
-        makerAtaA,
+        mintM: mintM.publicKey,
+        makerAtaM,
         memeRatio: memeRatioA,
         escrow,
-        vaultA,
+        vaultM,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
         systemProgram: SystemProgram.programId,
@@ -275,10 +275,10 @@ describe("tbw_yaminogemu", () => {
       .refund()
       .accountsStrict({
         maker: maker.publicKey,
-        mintA: mintA.publicKey,
-        makerAtaA,
+        mintM: mintM.publicKey,
+        makerAtaM,
         escrow,
-        vaultA,
+        vaultM,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
         systemProgram: SystemProgram.programId,
@@ -296,11 +296,11 @@ describe("tbw_yaminogemu", () => {
       .accountsStrict({ 
         taker: taker.publicKey,
         maker: maker.publicKey,
-        mintMeme: mintB.publicKey,
-        takerAtaB,
+        mintMeme: mintT.publicKey,
+        takerAtaT,
         memeRatio: memeRatioB,
         escrow,
-        vaultB,
+        vaultT,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
         systemProgram: SystemProgram.programId,
@@ -324,12 +324,12 @@ describe("tbw_yaminogemu", () => {
         maker: maker.publicKey,
         owner: maker.publicKey,
         mintBonk: mintBonk.publicKey,
-        mintWin: mintB.publicKey,
-        winnerAtaWin: takerAtaB,
+        mintWin: mintT.publicKey,
+        winnerAtaWin: takerAtaT,
         winnerAtaBonk: takerAtaBonk,
         ownership,
         escrow,
-        vaultWin: vaultB,
+        vaultWin: vaultT,
         ownershipBonk,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
@@ -352,11 +352,11 @@ describe("tbw_yaminogemu", () => {
       .accountsStrict({ 
         maker: maker.publicKey,
         owner: maker.publicKey,
-        mintLose: mintA.publicKey,
-        ownerAtaLose: makerAtaA,
+        mintLose: mintM.publicKey,
+        ownerAtaLose: makerAtaM,
         ownership,
         escrow,
-        vaultLose: vaultA,
+        vaultLose: vaultM,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
         systemProgram: SystemProgram.programId,
