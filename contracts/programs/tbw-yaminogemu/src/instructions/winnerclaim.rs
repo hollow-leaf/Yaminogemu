@@ -8,6 +8,7 @@ use anchor_spl::{
 use crate::Escrow;
 use crate::error::ErrorCode;
 use crate::OwnerCap;
+use crate::MemeRatio;
 
 #[derive(Accounts)]
 pub struct WinnerClaim<'info> {
@@ -18,7 +19,30 @@ pub struct WinnerClaim<'info> {
     #[account(mut)]
     pub owner: SystemAccount<'info>,
     pub mint_bonk: InterfaceAccount<'info, Mint>,
+    pub mint_meme: InterfaceAccount<'info, Mint>,
     pub mint_win: InterfaceAccount<'info, Mint>,
+
+    #[account(
+        has_one = owner,
+        seeds = [b"tbw_yaminogemu"],
+        bump
+    )]
+    pub ownership: Box<Account<'info, OwnerCap>>,
+    #[account(
+        has_one = mint_meme,
+        seeds = [b"meme", mint_meme.key().as_ref()],
+        bump
+    )]
+    pub meme_ratio: Box<Account<'info, MemeRatio>>,
+    #[account(
+        mut,
+        has_one = maker,
+        has_one = winner,
+        seeds = [b"escrow", maker.key().as_ref(), escrow.task_id.to_le_bytes().as_ref()],
+        bump = escrow.bump
+    )]
+    pub escrow: Box<Account<'info, Escrow>>,
+
     #[account(
         mut,
         associated_token::mint = mint_win,
@@ -34,19 +58,6 @@ pub struct WinnerClaim<'info> {
         associated_token::token_program = token_program,
     )]
     pub winner_ata_bonk: Box<InterfaceAccount<'info, TokenAccount>>,
-    #[account(
-        seeds = [b"tbw_yaminogemu"],
-        bump
-    )]
-    pub ownership: Box<Account<'info, OwnerCap>>,
-    #[account(
-        mut,
-        has_one = maker,
-        has_one = winner,
-        seeds = [b"escrow", maker.key().as_ref(), escrow.task_id.to_le_bytes().as_ref()],
-        bump = escrow.bump
-    )]
-    pub escrow: Box<Account<'info, Escrow>>,
     #[account(
         mut,
         associated_token::mint = mint_win,
@@ -109,7 +120,8 @@ impl WinnerClaim<'_> {
             &ownership_seeds,
         );
 
-        let bonk_amount = self.escrow.bonk_amount * self.ownership.claim_ratio / 100;
+        let bonk_amount = self.escrow.bonk_amount * self.meme_ratio.claim_ratio / 100;
+        // let bonk_amount = self.escrow.bonk_amount;
 
         transfer_checked(ctx_bonk, bonk_amount, self.mint_bonk.decimals)?;
 

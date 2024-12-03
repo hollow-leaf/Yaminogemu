@@ -16,7 +16,14 @@ pub struct Escrow {
 #[derive(InitSpace)]
 pub struct MemeRatio {
     pub mint_meme: Pubkey,
-    pub amount: u64, 
+    pub claim_ratio: u64,
+    pub meme_ratio: u64, 
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct ProviderVault {
+    pub bonk_amount: u64,
 }
 
 #[account]
@@ -24,6 +31,7 @@ pub struct MemeRatio {
 pub struct OwnerCap {
     pub owner: Pubkey,
     pub mint_bonk: Pubkey,
-    pub claim_ratio: u64,
+    pub total_bonk: u64,
+    pub actual_bonk: u64,
     pub bump: u8,
 }

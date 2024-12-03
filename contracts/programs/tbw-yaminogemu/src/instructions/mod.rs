@@ -4,11 +4,15 @@ pub mod take;
 pub mod init;
 pub mod add;
 pub mod winnerclaim;
-pub mod ownerclaim;
+pub mod vaultclaim;
 pub mod finalize;
+pub mod addliquidity;
+pub mod removeliquidity;
 
+pub use removeliquidity::*;
+pub use addliquidity::*;
 pub use finalize::*;
-pub use ownerclaim::*;
+pub use vaultclaim::*;
 pub use winnerclaim::*;
 pub use add::*;
 pub use init::*;

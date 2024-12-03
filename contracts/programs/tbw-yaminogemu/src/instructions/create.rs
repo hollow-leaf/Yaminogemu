@@ -65,7 +65,7 @@ impl Create<'_> {
         self.escrow.bonk_amount = bonk_amount;
         self.escrow.filled = false;
         self.escrow.bump = bumps.escrow;
-        let amount = bonk_amount * self.meme_ratio.amount;
+        let amount = bonk_amount * self.meme_ratio.meme_ratio;
         let transfer_accounts = TransferChecked {
             from: self.maker_ata_m.to_account_info(),
             mint: self.mint_m.to_account_info(),

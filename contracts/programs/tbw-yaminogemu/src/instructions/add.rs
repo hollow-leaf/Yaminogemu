@@ -32,11 +32,17 @@ pub struct Add<'info> {
 }
 
 impl Add<'_> {
-    pub fn set_amount(&mut self, amount: u64) -> Result<()> {
+    pub fn set_ratio(&mut self, meme_ratio: u64, claim_ratio: u64) -> Result<()> {
         self.meme_ratio.set_inner( MemeRatio {
             mint_meme: self.mint_meme.key(),
-            amount,
+            meme_ratio,
+            claim_ratio,
         });
+        Ok(())
+    }
+    pub fn change_ratio(&mut self, meme_ratio: u64, claim_ratio: u64) -> Result<()> {
+        self.meme_ratio.meme_ratio = meme_ratio;
+        self.meme_ratio.claim_ratio = claim_ratio;
         Ok(())
     }
 }

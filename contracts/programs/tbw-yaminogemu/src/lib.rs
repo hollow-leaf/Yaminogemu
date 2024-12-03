@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("AeS3SmHTHfD7YMLjeiEXfggxeafeqoVxuxZD9bJh9Y8e");
+declare_id!("FK7BLQiq6bWd4ef3fa7RvoEYQ43q9BP1bkrdJ8RFid77");
 
 #[program]
 pub mod tbw_yaminogemu {
@@ -20,20 +20,20 @@ pub mod tbw_yaminogemu {
         ctx.accounts.init(&ctx.bumps)
     }
 
-    pub fn set_ratio(ctx: Context<Init>, ratio: u64) -> Result<()> {
-        ctx.accounts.set_ratio(ratio)
+    pub fn deposit(ctx: Context<AddLiquidity>, bonk_amount: u64) -> Result<()> {
+        ctx.accounts.add_liquidity(bonk_amount)
     }
 
-    pub fn deposit(ctx: Context<Init>, bonk_amount: u64) -> Result<()> {
-        ctx.accounts.deposit(bonk_amount)
+    pub fn withdraw(ctx: Context<RemoveLiquidity>, remove_amount: u64) -> Result<()> {
+        ctx.accounts.remove_liquidity(remove_amount)
     }
 
-    pub fn withdraw(ctx: Context<Init>, bonk_amount: u64) -> Result<()> {
-        ctx.accounts.withdraw(bonk_amount)
+    pub fn add(ctx: Context<Add>, meme_ratio: u64, claim_ratio: u64) -> Result<()> {
+        ctx.accounts.set_ratio(meme_ratio, claim_ratio)
     }
 
-    pub fn add(ctx: Context<Add>, amount: u64) -> Result<()> {
-        ctx.accounts.set_amount(amount)
+    pub fn set_ratio(ctx: Context<Add>, meme_ratio: u64, claim_ratio: u64) -> Result<()> {
+        ctx.accounts.change_ratio(meme_ratio, claim_ratio)
     }
 
     pub fn create(ctx: Context<Create>, task_id: u64, bonk_amount: u64) -> Result<()> {
@@ -56,7 +56,7 @@ pub mod tbw_yaminogemu {
         ctx.accounts.winner_claim()
     }
 
-    pub fn owner_claim(ctx: Context<OwnerClaim>) -> Result<()> {
-        ctx.accounts.owner_claim()
+    pub fn vault_claim(ctx: Context<VaultClaim>) -> Result<()> {
+        ctx.accounts.vault_claim()
     }
 }

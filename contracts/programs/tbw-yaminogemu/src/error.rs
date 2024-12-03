@@ -8,4 +8,6 @@ pub enum ErrorCode {
     AlreadyFilledError,
     #[msg("Not filled, can not withdraw")]
     NotFilledError,
+    #[msg("Out of claim amount")]
+    OutOfClaimAmountError,
 }

@@ -8,28 +8,34 @@ use anchor_spl::{
 use crate::Escrow;
 use crate::error::ErrorCode;
 use crate::OwnerCap;
+use crate::MemeRatio;
 
 #[derive(Accounts)]
-pub struct OwnerClaim<'info> {
+pub struct VaultClaim<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
     #[account(mut)]
     pub maker: SystemAccount<'info>,
-    pub mint_lose: InterfaceAccount<'info, Mint>,
+    pub mint_meme: InterfaceAccount<'info, Mint>,
     #[account(
-        has_one = owner,
         seeds = [b"tbw_yaminogemu"],
         bump
     )]
     pub ownership: Box<Account<'info, OwnerCap>>,
     #[account(
+        has_one = mint_meme,
+        seeds = [b"meme", mint_meme.key().as_ref()],
+        bump
+    )]
+    pub meme_ratio: Box<Account<'info, MemeRatio>>,
+    #[account(
         init_if_needed,
         payer = owner,
-        associated_token::mint = mint_lose,
-        associated_token::authority = owner,
-        associated_token::token_program = token_program,
+        associated_token::mint = mint_meme,
+        associated_token::authority = ownership,
+        associated_token::token_program = token_program
     )]
-    pub owner_ata_lose: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub ownership_meme: InterfaceAccount<'info, TokenAccount>,
     #[account(
         mut,
         close = owner,
@@ -40,18 +46,18 @@ pub struct OwnerClaim<'info> {
     pub escrow: Box<Account<'info, Escrow>>,
     #[account(
         mut,
-        associated_token::mint = mint_lose,
+        associated_token::mint = mint_meme,
         associated_token::authority = escrow,
         associated_token::token_program = token_program,
     )]
-    pub vault_lose: Box<InterfaceAccount<'info, TokenAccount>>,
+    pub vault_meme: Box<InterfaceAccount<'info, TokenAccount>>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
 }
 
-impl OwnerClaim<'_> {
-    pub fn owner_claim(&mut self) -> Result<()> {
+impl VaultClaim<'_> {
+    pub fn vault_claim(&mut self) -> Result<()> {
         require!(self.escrow.filled, ErrorCode::NotFilledError);
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",
@@ -61,9 +67,9 @@ impl OwnerClaim<'_> {
         ]];
 
         let accounts_b = TransferChecked {
-            from: self.vault_lose.to_account_info(),
-            mint: self.mint_lose.to_account_info(),
-            to: self.owner_ata_lose.to_account_info(),
+            from: self.vault_meme.to_account_info(),
+            mint: self.mint_meme.to_account_info(),
+            to: self.ownership_meme.to_account_info(),
             authority: self.escrow.to_account_info(),
         };
 
@@ -73,10 +79,11 @@ impl OwnerClaim<'_> {
             &signer_seeds,
         );
 
-        transfer_checked(ctx_b, self.vault_lose.amount, self.mint_lose.decimals)?;
-
+        transfer_checked(ctx_b, self.vault_meme.amount, self.mint_meme.decimals)?;
+        let amount = self.vault_meme.amount - self.meme_ratio.meme_ratio * self.escrow.bonk_amount;
+        self.ownership.actual_bonk += amount;
         let accounts_lose = CloseAccount {
-            account: self.vault_lose.to_account_info(),
+            account: self.vault_meme.to_account_info(),
             destination: self.owner.to_account_info(),
             authority: self.escrow.to_account_info(),
         };
