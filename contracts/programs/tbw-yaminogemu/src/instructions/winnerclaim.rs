@@ -109,7 +109,9 @@ impl WinnerClaim<'_> {
             &ownership_seeds,
         );
 
-        transfer_checked(ctx_bonk, self.escrow.bonk_amount, self.mint_bonk.decimals)?;
+        let bonk_amount = self.escrow.bonk_amount * self.ownership.claim_ratio / 100;
+
+        transfer_checked(ctx_bonk, bonk_amount, self.mint_bonk.decimals)?;
 
         let accounts_win = CloseAccount {
             account: self.vault_win.to_account_info(),

@@ -31,7 +31,6 @@ describe("tbw_yaminogemu", () => {
   const program = anchor.workspace.TbwYaminogemu as Program<TbwYaminogemu>;
 
   const tokenProgram = TOKEN_2022_PROGRAM_ID;
-  // const tokenProgram = TOKEN_PROGRAM_ID;
 
   const confirm = async (signature: string): Promise<string> => {
     const block = await connection.getLatestBlockhash();
@@ -145,6 +144,25 @@ describe("tbw_yaminogemu", () => {
   it("Init", async () => {
     await program.methods
       .init()
+      .accountsStrict({
+        owner: owner.publicKey,
+        ownership,
+        mintBonk: mintBonk.publicKey,
+        ownerAtaBonk: ownerAtaBonk,
+        ownershipBonk,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([owner])
+      .rpc()
+      .then(confirm)
+      .then(log);
+  });
+
+  it("Set Ratio", async () => {
+    await program.methods
+      .setRatio(new BN(64))
       .accountsStrict({
         owner: owner.publicKey,
         ownership,

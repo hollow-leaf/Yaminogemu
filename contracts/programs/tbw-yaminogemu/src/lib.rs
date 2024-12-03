@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("6gLPAfYyWsyj6RPAs3gZ9Q4U48cBpH4FWpjJ7vN2MADX");
+declare_id!("AeS3SmHTHfD7YMLjeiEXfggxeafeqoVxuxZD9bJh9Y8e");
 
 #[program]
 pub mod tbw_yaminogemu {
@@ -18,6 +18,10 @@ pub mod tbw_yaminogemu {
 
     pub fn init(ctx: Context<Init>) -> Result<()> {
         ctx.accounts.init(&ctx.bumps)
+    }
+
+    pub fn set_ratio(ctx: Context<Init>, ratio: u64) -> Result<()> {
+        ctx.accounts.set_ratio(ratio)
     }
 
     pub fn deposit(ctx: Context<Init>, bonk_amount: u64) -> Result<()> {

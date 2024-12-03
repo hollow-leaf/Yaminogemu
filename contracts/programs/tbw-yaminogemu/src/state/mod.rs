@@ -24,5 +24,6 @@ pub struct MemeRatio {
 pub struct OwnerCap {
     pub owner: Pubkey,
     pub mint_bonk: Pubkey,
+    pub claim_ratio: u64,
     pub bump: u8,
 }

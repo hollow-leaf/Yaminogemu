@@ -1,0 +1,10 @@
+{
+  "name": "yaminogemu",
+  "binaryPath": "./yaminogemu/target/riscv-guest/riscv32im-risc0-zkvm-elf/docker/yaminogemu/yaminogemu",
+  "imageId": "d4c336f198eef61912edf174879601737d411ccce5905f844aa1b0b755e5eaca",
+  "inputOrder": [
+    "Public"
+  ],
+  "signature": "42sapK3uge4pikE9523dteAsePazebzgBgAN96sCm3hrphtk9QrgNxRiiWx4kowviMZpekpC2fSGD6Ko16oEgZ88",
+  "size": 116376
+}

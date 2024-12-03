@@ -46,8 +46,13 @@ impl Init<'_> {
         self.ownership.set_inner( OwnerCap {
             owner: self.owner.key(),
             mint_bonk: self.mint_bonk.key(),
+            claim_ratio: 100,
             bump: bumps.ownership,
         });
+        Ok(())
+    }
+    pub fn set_ratio(&mut self, ratio: u64) -> Result<()> {
+        self.ownership.claim_ratio = ratio;
         Ok(())
     }
     pub fn deposit(&mut self, bonk_amount: u64) -> Result<()> {
