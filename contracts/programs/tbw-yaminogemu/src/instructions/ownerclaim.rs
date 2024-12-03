@@ -10,7 +10,7 @@ use crate::error::ErrorCode;
 use crate::OwnerCap;
 
 #[derive(Accounts)]
-pub struct Claim<'info> {
+pub struct OwnerClaim<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
     #[account(mut)]
@@ -50,8 +50,8 @@ pub struct Claim<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl Claim<'_> {
-    pub fn claim_and_close_vault(&mut self) -> Result<()> {
+impl OwnerClaim<'_> {
+    pub fn owner_claim(&mut self) -> Result<()> {
         require!(self.escrow.filled, ErrorCode::NotFilledError);
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",

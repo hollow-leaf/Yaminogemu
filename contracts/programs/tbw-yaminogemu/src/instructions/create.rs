@@ -52,14 +52,19 @@ pub struct Create<'info> {
 
 impl Create<'_> {
     pub fn create_task(&mut self, task_id: u64, bonk_amount: u64, bumps: &CreateBumps) -> Result<()> {
-        self.escrow.set_inner(Escrow {
-            task_id,
-            maker: self.maker.key(),
-            mint_m: self.mint_m.key(),
-            bonk_amount,
-            filled: false,
-            bump: bumps.escrow,
-        });
+        // self.escrow.set_inner(Escrow {
+        //     task_id,
+        //     maker: self.maker.key(),
+        //     mint_m: self.mint_m.key(),
+        //     bonk_amount,
+        //     filled: false,
+        //     bump: bumps.escrow,
+        // });
+        self.escrow.task_id = task_id;
+        self.escrow.maker =  self.maker.key();
+        self.escrow.bonk_amount = bonk_amount;
+        self.escrow.filled = false;
+        self.escrow.bump = bumps.escrow;
         let amount = bonk_amount * self.meme_ratio.amount;
         let transfer_accounts = TransferChecked {
             from: self.maker_ata_m.to_account_info(),

@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("883NJTQP8WQpME36TEuEkZNFHJ1qok5WsyoZ7mKKyw34");
+declare_id!("6gLPAfYyWsyj6RPAs3gZ9Q4U48cBpH4FWpjJ7vN2MADX");
 
 #[program]
 pub mod tbw_yaminogemu {
@@ -45,10 +45,14 @@ pub mod tbw_yaminogemu {
     }
 
     pub fn finalize(ctx: Context<Finalize>) -> Result<()> {
-        ctx.accounts.send_and_close_vault()
+        ctx.accounts.finalize()
     }
 
-    pub fn claim(ctx: Context<Claim>) -> Result<()> {
-        ctx.accounts.claim_and_close_vault()
+    pub fn winner_claim(ctx: Context<WinnerClaim>) -> Result<()> {
+        ctx.accounts.winner_claim()
+    }
+
+    pub fn owner_claim(ctx: Context<OwnerClaim>) -> Result<()> {
+        ctx.accounts.owner_claim()
     }
 }

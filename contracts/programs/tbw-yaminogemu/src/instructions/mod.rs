@@ -3,11 +3,13 @@ pub mod refund;
 pub mod take;
 pub mod init;
 pub mod add;
+pub mod winnerclaim;
+pub mod ownerclaim;
 pub mod finalize;
-pub mod claim;
 
-pub use claim::*;
 pub use finalize::*;
+pub use ownerclaim::*;
+pub use winnerclaim::*;
 pub use add::*;
 pub use init::*;
 pub use take::*;

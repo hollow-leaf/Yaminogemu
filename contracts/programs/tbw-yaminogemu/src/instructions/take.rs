@@ -50,6 +50,7 @@ pub struct Take<'info> {
 
 impl Take<'_> {
     pub fn deposit(&mut self) -> Result<()> {
+        self.escrow.mint_t = self.taker.key();
         let amount = self.escrow.bonk_amount * self.meme_ratio.amount;
         let transfer_accounts = TransferChecked {
             from: self.taker_ata_t.to_account_info(),

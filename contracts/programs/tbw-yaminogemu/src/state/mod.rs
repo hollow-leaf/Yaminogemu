@@ -6,6 +6,8 @@ pub struct Escrow {
     pub task_id: u64,
     pub maker: Pubkey,
     pub mint_m: Pubkey,
+    pub mint_t: Pubkey,
+    pub winner: Pubkey,
     pub bonk_amount: u64,
     pub filled: bool,
     pub bump: u8,
