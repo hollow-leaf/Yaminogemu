@@ -1,4 +1,7 @@
+'use client'
 import Link from 'next/link'
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
+import { handleSendTransaction } from '@/hooks/useSendTransaction'
 
 const hall_data = [
   [
@@ -25,6 +28,8 @@ const hall_data = [
 ]
 
 export default function Hall() {
+  const { primaryWallet } = useDynamicContext()
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[90%] max-w-[400px] md:max-w-[600px] lg:max-w-[800px] aspect-[9/16] md:aspect-[12/16] lg:aspect-[14/16] rounded-xl p-6">
@@ -70,8 +75,16 @@ export default function Hall() {
               Play
             </button>
           </Link>
-          <button className="w-full bg-white text-blue-500 font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90">
-            How to Play
+          <button
+            onClick={() =>
+              handleSendTransaction(
+                primaryWallet || null,
+                'ApWyxz5L6WRCGXxQ8uwThz8ppxvdFrQDQDp9sHF4qWGC'
+              )
+            }
+            className="w-full bg-white text-blue-500 font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90"
+          >
+            Test Send 0.01 sol
           </button>
         </div>
       </div>

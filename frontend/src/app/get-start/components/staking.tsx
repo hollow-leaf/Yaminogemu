@@ -1,18 +1,27 @@
 'use client'
-import { useAccount, useBalance } from 'wagmi'
 import { formatAddress } from '@/utils/strignfy'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useUserWallets } from '@dynamic-labs/sdk-react-core'
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useEffect, useState } from 'react'
 
 export default function Staking() {
-  const account = useAccount()
-  const balance = useBalance({
-    address: account?.address?.startsWith('0x')
-      ? account.address
-      : `0x${account?.address}`
-  })
+  const userWallets = useUserWallets()
+  const { primaryWallet } = useDynamicContext();
+  const [balance, setBalance] = useState<string | undefined | null>(null);
 
-  const router = useRouter()
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (primaryWallet) {
+        const value = await primaryWallet.getBalance()
+        setBalance(value as string | undefined);
+      }
+    };
+    fetchBalance();
+  }, [primaryWallet]);
+
+  const router = useRouter(); 
   const handleStaking = () => {
     console.log('clicked!')
     if (true) {
@@ -24,7 +33,12 @@ export default function Staking() {
     <div className="w-full max-w-[400px] md:max-w-[600px] lg:max-w-[800px] p-4 md:p-6 lg:p-8 mb-16">
       <div className="flex items-center gap-2 mb-3 md:mb-4">
         <span className="text-sm md:text-sm lg:text-base text-gray-500">
-          Hi {formatAddress(account.address ?? '')}
+          Hi 
+          {userWallets.map((wallet) => (
+          <p key={wallet.id}>
+            {formatAddress(wallet.address)}
+          </p>
+          ))}
         </span>
         <span className="text-lg md:text-xl lg:text-2xl">👋</span>
       </div>
@@ -48,12 +62,16 @@ export default function Staking() {
             🪙
           </span>
           <div>
-            <p className="font-bold text-base md:text-lg lg:text-xl">
-              {balance.data?.formatted}
-            </p>
-            <p className="text-xs md:text-xs lg:text-sm text-gray-500">
-              {balance.data?.symbol}
-            </p>
+            <span className="font-bold text-base md:text-lg lg:text-xl">
+              {balance}
+            </span>
+            <span className="font-bold text-base md:text-lg lg:text-xl">
+            {userWallets.map((wallet)=>(
+                <p key={wallet.id}>
+                  {wallet.chain}
+                </p>
+              ))}
+            </span>
           </div>
         </div>
       </div>
