@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("FK7BLQiq6bWd4ef3fa7RvoEYQ43q9BP1bkrdJ8RFid77");
+declare_id!("26i5kWTyQqLnqJk85yPWqMaBbaAVVBaK7X2NYoSZmNCN");
 
 #[program]
 pub mod tbw_yaminogemu {

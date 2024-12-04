@@ -1,0 +1,12 @@
+{
+    "name": "BONK",
+    "symbol": "bonk",
+    "description": "Only Possible On Bonk",
+    "image": "https://gateway.pinata.cloud/ipfs/QmRi955Hd7fQsE74UvkjMsctUg7wyJNqMu3xWjM8sTYmnS",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+}

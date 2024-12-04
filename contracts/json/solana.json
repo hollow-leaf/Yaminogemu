@@ -1,0 +1,12 @@
+{
+    "name": "OPOS",
+    "symbol": "OPOS",
+    "description": "Only Possible On Solana",
+    "image": "https://gateway.pinata.cloud/ipfs/QmV7ppzXJ3iN6smqWbuKEmuNtdq6RwGE6PfDW4M56nkWrY",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }

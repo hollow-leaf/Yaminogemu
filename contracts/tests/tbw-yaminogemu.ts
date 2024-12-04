@@ -10,15 +10,28 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import {
+  ExtensionType,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   MINT_SIZE,
+  MetadataPointerInstruction,
   TOKEN_2022_PROGRAM_ID,
+  getMintLen,
   createAssociatedTokenAccountIdempotentInstruction,
+  createInitializeMetadataPointerInstruction,
   createInitializeMint2Instruction,
   createMintToInstruction,
   getAssociatedTokenAddressSync,
   getMinimumBalanceForRentExemptMint,
+  TYPE_SIZE,
+  LENGTH_SIZE,
 } from "@solana/spl-token";
+import {
+  createInitializeInstruction,
+  createUpdateFieldInstruction,
+  createRemoveKeyInstruction,
+  pack,
+  TokenMetadata,
+} from "@solana/spl-token-metadata";
 import { randomBytes } from "crypto";
 
 describe("tbw_yaminogemu", () => {
@@ -49,10 +62,40 @@ describe("tbw_yaminogemu", () => {
   };
 
   const task_id = new BN(randomBytes(8));
-
-  const [maker, taker, owner, mintM, mintT, mintBonk] = Array.from({ length: 6 }, () =>
+  const owner = provider
+  const [maker, taker, mintM, mintT, mintBonk] = Array.from({ length: 5 }, () =>
     Keypair.generate()
   );
+
+  // Metadata to store in Mint Account
+  const metaDataBonk: TokenMetadata = {
+    updateAuthority: provider.publicKey,
+    mint: mintBonk.publicKey,
+    name: "BONK",
+    symbol: "bonk",
+    uri: "https://gateway.pinata.cloud/ipfs/Qmd3FfsyaGfR2yrnNNCxreMKkvn9ByjsL3Te2CG2ozVM89",
+    additionalMetadata: [["description", "Only Possible On Bonk"]],
+  };
+
+  // Metadata to store in Mint Account
+  const metaDataSol: TokenMetadata = {
+    updateAuthority: provider.publicKey,
+    mint: mintM.publicKey,
+    name: "OPOS",
+    symbol: "OPOS",
+    uri: "https://gateway.pinata.cloud/ipfs/QmWwzuHwYvpahsN3jQuvS7yPT3zMrdE4iw8ucStjEAAYFo",
+    additionalMetadata: [["description", "Only Possible On Solana"]],
+  };
+
+  // Metadata to store in Mint Account
+  const metaDataZeus: TokenMetadata = {
+    updateAuthority: provider.publicKey,
+    mint: mintT.publicKey,
+    name: "OPOZ",
+    symbol: "OPOZ",
+    uri: "https://gateway.pinata.cloud/ipfs/QmSF4qYjNJ6VgR4wBq5Ej6aMFZSy19JHQLXQSXu2MMRwec",
+    additionalMetadata: [["description", "Only Possible On Zeus"]],
+  };
 
   const [makerAtaM, makerAtaT, makerAtaBonk, takerAtaM, takerAtaT, takerAtaBonk, ownerAtaM, ownerAtaT, ownerAtaBonk] = [maker, taker, owner]
     .map((a) =>
@@ -61,8 +104,6 @@ describe("tbw_yaminogemu", () => {
       )
     )
     .flat();
-  
-  
 
   const escrow = PublicKey.findProgramAddressSync(
     [Buffer.from("escrow"), maker.publicKey.toBuffer(), task_id.toArrayLike(Buffer, "le", 8)],
@@ -94,56 +135,94 @@ describe("tbw_yaminogemu", () => {
 
 
   it("Airdrop and create mints", async () => {
-    let lamports = await getMinimumBalanceForRentExemptMint(connection);
+    // let lamports = await getMinimumBalanceForRentExemptMint(connection);
     let tx = new Transaction();
-    tx.instructions = [
+    // Size of MetadataExtension 2 bytes for type, 2 bytes for length
+    const metadataExtension = TYPE_SIZE + LENGTH_SIZE;
+    // Size of metadata
+    const metadataZeusLen = pack(metaDataZeus).length;
+
+    // Size of Mint Account with extension
+    const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+
+    // Minimum lamports required for Mint Account
+    const lamports = await connection.getMinimumBalanceForRentExemption(
+      mintLen + metadataExtension + metadataZeusLen,
+    );
+
+    // Transaction 1: Airdrop lamports to accounts
+    const airdropTx = new Transaction();
+    airdropTx.add(
       ...[maker, taker, owner].map((account) =>
         SystemProgram.transfer({
           fromPubkey: provider.publicKey,
           toPubkey: account.publicKey,
           lamports: 0.04 * LAMPORTS_PER_SOL,
         })
-      ),
-      ...[mintM, mintT].map((mint) =>
+      )
+    );
+    await provider.sendAndConfirm(airdropTx, []).then(log);
+
+    // Transaction 2: Create Mint Accounts
+    const createMintsTx = new Transaction();
+    createMintsTx.add(
+      ...[mintM, mintT, mintBonk].map((mint) =>
         SystemProgram.createAccount({
           fromPubkey: provider.publicKey,
           newAccountPubkey: mint.publicKey,
           lamports,
-          space: MINT_SIZE,
+          space: mintLen,
           programId: tokenProgram,
         })
-      ),
-      ...[
-        { mint: mintM.publicKey, authority: maker.publicKey, ata: makerAtaM },
-        { mint: mintT.publicKey, authority: taker.publicKey, ata: takerAtaT },
-      ]
-      .flatMap((x) => [
-        createInitializeMint2Instruction(x.mint, 6, x.authority, null, tokenProgram),
-        createAssociatedTokenAccountIdempotentInstruction(provider.publicKey, x.ata, x.authority, x.mint, tokenProgram),
-        createMintToInstruction(x.mint, x.ata, x.authority, 3e9, undefined, tokenProgram),
-      ])
-    ];
+      )
+    );
+    await provider.sendAndConfirm(createMintsTx, [mintM, mintT, mintBonk]).then(log);
 
-    await provider.sendAndConfirm(tx, [mintM, mintT, maker, taker]).then(log);
+    // Transaction 3: Initialize Metadata and Mint Instructions
+    const initializeMintsTx = new Transaction();
+    initializeMintsTx.add(
+      ...[
+        { mint: mintM.publicKey, metadata: metaDataZeus },
+        { mint: mintT.publicKey, metadata: metaDataSol },
+        { mint: mintBonk.publicKey, metadata: metaDataBonk },
+      ].flatMap((x) => [
+        createInitializeMetadataPointerInstruction(x.mint, provider.publicKey, x.mint, tokenProgram),
+        createInitializeMint2Instruction(x.mint, 6, provider.publicKey, null, tokenProgram),
+        createInitializeInstruction({
+          programId: tokenProgram,
+          metadata: x.mint,
+          updateAuthority: provider.publicKey,
+          mint: x.mint,
+          mintAuthority: provider.publicKey,
+          name: x.metadata.name,
+          symbol: x.metadata.symbol,
+          uri: x.metadata.uri,
+        }),
+      ])
+    );
+    await provider.sendAndConfirm(initializeMintsTx, []).then(log);
   });
+
 
   it("Airdrop Bonk", async () => {
     let lamports = await getMinimumBalanceForRentExemptMint(connection);
     let tx = new Transaction();
     tx.instructions = [
-      SystemProgram.createAccount({
-        fromPubkey: provider.publicKey,
-        newAccountPubkey: mintBonk.publicKey,
-        lamports,
-        space: MINT_SIZE,
-        programId: tokenProgram,
-      }),
-      createInitializeMint2Instruction(mintBonk.publicKey, 6, owner.publicKey, null, tokenProgram),
-      createAssociatedTokenAccountIdempotentInstruction(provider.publicKey,  ownerAtaBonk, owner.publicKey, mintBonk.publicKey, tokenProgram),
-      createMintToInstruction(mintBonk.publicKey, ownerAtaBonk, owner.publicKey, 10e9, undefined, tokenProgram),
+      ...[
+        { mint: mintM.publicKey, ata: makerAtaM, receiver: maker.publicKey },
+        { mint: mintT.publicKey, ata: takerAtaT, receiver: taker.publicKey },
+        { mint: mintBonk.publicKey, ata: ownerAtaBonk, receiver: provider.publicKey },
+      ].flatMap((x) => [
+        createAssociatedTokenAccountIdempotentInstruction(x.receiver, x.ata, x.receiver, x.mint, tokenProgram),
+        createMintToInstruction(x.mint, x.ata, provider.publicKey, 10e9, undefined, tokenProgram),
+      ]),
     ];
-
-    await provider.sendAndConfirm(tx, [mintBonk, owner]).then(log);
+    console.log("mintM",mintM.publicKey)
+    console.log("mintT", mintT.publicKey)
+    console.log("mintBonk", mintBonk.publicKey)
+    console.log("maker",maker.publicKey)
+    console.log("taker",taker.publicKey)
+    await provider.sendAndConfirm(tx, [maker, taker]).then(log);
   });
 
   it("Init", async () => {
@@ -157,7 +236,6 @@ describe("tbw_yaminogemu", () => {
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
-      .signers([owner])
       .rpc()
       .then(confirm)
       .then(log);
@@ -165,7 +243,7 @@ describe("tbw_yaminogemu", () => {
 
   it("Add", async () => {
     await program.methods
-      .add(new BN(4),new BN(85))
+      .add(new BN(4), new BN(85))
       .accountsStrict({
         owner: owner.publicKey,
         mintMeme: mintM.publicKey,
@@ -174,7 +252,6 @@ describe("tbw_yaminogemu", () => {
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
-      .signers([owner])
       .rpc()
       .then(confirm)
       .then(log);
@@ -182,7 +259,7 @@ describe("tbw_yaminogemu", () => {
 
   it("Add", async () => {
     await program.methods
-      .add(new BN(2),new BN(95))
+      .add(new BN(2), new BN(95))
       .accountsStrict({
         owner: owner.publicKey,
         mintMeme: mintT.publicKey,
@@ -191,7 +268,6 @@ describe("tbw_yaminogemu", () => {
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
-      .signers([owner])
       .rpc()
       .then(confirm)
       .then(log);
@@ -199,7 +275,7 @@ describe("tbw_yaminogemu", () => {
 
   it("Set Ratio", async () => {
     await program.methods
-      .setRatio(new BN(2),new BN(85))
+      .setRatio(new BN(2), new BN(85))
       .accountsStrict({
         owner: owner.publicKey,
         mintMeme: mintM.publicKey,
@@ -208,7 +284,6 @@ describe("tbw_yaminogemu", () => {
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
-      .signers([owner])
       .rpc()
       .then(confirm)
       .then(log);
@@ -228,7 +303,6 @@ describe("tbw_yaminogemu", () => {
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
-      .signers([owner])
       .rpc()
       .then(confirm)
       .then(log);
@@ -249,7 +323,6 @@ describe("tbw_yaminogemu", () => {
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
-      .signers([owner])
       .rpc()
       .then(confirm)
       .then(log);
@@ -275,7 +348,7 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  xit("Refund", async () => {
+  it("Refund", async () => {
     await program.methods
       .refund()
       .accountsStrict({
@@ -296,105 +369,104 @@ describe("tbw_yaminogemu", () => {
 
   it("Take", async () => {
     try {
-    await program.methods
-      .take()
-      .accountsStrict({ 
-        taker: taker.publicKey,
-        maker: maker.publicKey,
-        mintMeme: mintT.publicKey,
-        takerAtaT,
-        memeRatio: memeRatioT,
-        escrow,
-        vaultT,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        tokenProgram,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([taker])
-      .rpc()
-      .then(confirm)
-      .then(log);
-    } catch(e) {
+      await program.methods
+        .take()
+        .accountsStrict({
+          taker: taker.publicKey,
+          maker: maker.publicKey,
+          mintMeme: mintT.publicKey,
+          takerAtaT,
+          memeRatio: memeRatioT,
+          escrow,
+          vaultT,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          tokenProgram,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([taker])
+        .rpc()
+        .then(confirm)
+        .then(log);
+    } catch (e) {
       console.log(e);
-      throw(e)
+      throw (e)
     }
   });
 
   it("Finalize", async () => {
     try {
-    await program.methods
-      .finalize()
-      .accountsStrict({ 
-        prover: taker.publicKey,
-        maker: maker.publicKey,
-        escrow,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([taker])
-      .rpc()
-      .then(confirm)
-      .then(log);
-    } catch(e) {
+      await program.methods
+        .finalize()
+        .accountsStrict({
+          prover: taker.publicKey,
+          maker: maker.publicKey,
+          escrow,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([taker])
+        .rpc()
+        .then(confirm)
+        .then(log);
+    } catch (e) {
       console.log(e);
-      throw(e)
+      throw (e)
     }
   });
   it("Winner Claim", async () => {
     try {
-    await program.methods
-      .winnerClaim()
-      .accountsStrict({ 
-        winner: maker.publicKey,
-        maker: maker.publicKey,
-        owner: owner.publicKey,
-        mintBonk: mintBonk.publicKey,
-        mintMeme: mintT.publicKey,
-        mintWin: mintM.publicKey,
-        ownership,
-        memeRatio: memeRatioT,
-        escrow,
-        winnerAtaWin: makerAtaM,
-        winnerAtaBonk: makerAtaBonk,
-        vaultWin: vaultM,
-        ownershipBonk,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        tokenProgram,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([maker])
-      .rpc()
-      .then(confirm)
-      .then(log);
-    } catch(e) {
+      await program.methods
+        .winnerClaim()
+        .accountsStrict({
+          winner: maker.publicKey,
+          maker: maker.publicKey,
+          owner: owner.publicKey,
+          mintBonk: mintBonk.publicKey,
+          mintMeme: mintT.publicKey,
+          mintWin: mintM.publicKey,
+          ownership,
+          memeRatio: memeRatioT,
+          escrow,
+          winnerAtaWin: makerAtaM,
+          winnerAtaBonk: makerAtaBonk,
+          vaultWin: vaultM,
+          ownershipBonk,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          tokenProgram,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([maker])
+        .rpc()
+        .then(confirm)
+        .then(log);
+    } catch (e) {
       console.log(e);
-      throw(e)
+      throw (e)
     }
   });
 
   it("Owner Claim", async () => {
     try {
-    await program.methods
-      .vaultClaim()
-      .accountsStrict({ 
-        owner: owner.publicKey,
-        maker: maker.publicKey,
-        mintMeme: mintT.publicKey,
-        ownership,
-        memeRatio: memeRatioT,
-        ownershipMeme: ownershipT,
-        escrow,
-        vaultMeme: vaultT,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        tokenProgram,
-        systemProgram: SystemProgram.programId,
-      })
-      .signers([owner])
-      .rpc()
-      .then(confirm)
-      .then(log);
-    } catch(e) {
+      await program.methods
+        .vaultClaim()
+        .accountsStrict({
+          owner: owner.publicKey,
+          maker: maker.publicKey,
+          mintMeme: mintT.publicKey,
+          ownership,
+          memeRatio: memeRatioT,
+          ownershipMeme: ownershipT,
+          escrow,
+          vaultMeme: vaultT,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          tokenProgram,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc()
+        .then(confirm)
+        .then(log);
+    } catch (e) {
       console.log(e);
-      throw(e)
+      throw (e)
     }
   });
 
@@ -413,7 +485,6 @@ describe("tbw_yaminogemu", () => {
         tokenProgram,
         systemProgram: SystemProgram.programId,
       })
-      .signers([owner])
       .rpc()
       .then(confirm)
       .then(log);

@@ -62,6 +62,7 @@ impl Create<'_> {
         // });
         self.escrow.task_id = task_id;
         self.escrow.maker =  self.maker.key();
+        self.escrow.mint_m = self.mint_m.key();
         self.escrow.bonk_amount = bonk_amount;
         self.escrow.filled = false;
         self.escrow.bump = bumps.escrow;

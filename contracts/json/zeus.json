@@ -1,0 +1,12 @@
+{
+    "name": "OPOZ",
+    "symbol": "OPOZ",
+    "description": "Only Possible On Zeus",
+    "image": "https://gateway.pinata.cloud/ipfs/QmNwtm6ZbpNCLk2JzkqtJZPjfk1cheXrWskyYgtLeBU57B",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }
