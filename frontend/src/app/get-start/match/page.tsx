@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import Match from './components/match'
+import Match from './match'
 import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core'
 
 export default function Home() {

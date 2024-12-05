@@ -8,7 +8,7 @@ import {
 } from '@solana/web3.js'
 
 // send 0.01 sol to destination address
-export async function handleSendTransaction(
+export async function SendTransaction(
   primaryWallet: Wallet | null,
   DestinationAddress: string
 ) {
@@ -59,3 +59,7 @@ export async function handleSendTransaction(
     console.error('Transaction failed:', error)
   }
 }
+
+export async function useWriteContract() {}
+
+export async function useReadContract() {}

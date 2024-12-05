@@ -1,31 +1,40 @@
 'use client'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function Victory() {
-  const router = useRouter()
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-green-600 to-green-800 text-white p-8 rounded-lg shadow-2xl">
-      <div className="mb-8 text-center">
-        <h2 className="text-6xl font-bold mb-4 animate-bounce">Victory!</h2>
-        <p className="text-xl opacity-80">You won the game. Congratulations!</p>
+    <div className="flex flex-col items-center justify-center bg-gradient-to-b from-purple-900 via-indigo-800 to-blue-900 text-white p-8 rounded-xl">
+      {/* Victory Banner */}
+      <div className="text-center">
+        <h2 className="text-5xl md:text-7xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-500 animate-pulse">
+          Victory!
+        </h2>
+        <p className="text-xl md:text-2xl font-light opacity-80">
+          You have conquered the challenge. Well done!
+        </p>
       </div>
 
-      <div className="flex flex-col items-center gap-4">
-        <p className="text-lg font-semibold">Want to try again?</p>
-        <div className="flex gap-4">
-          <button
-            className="px-6 py-3 bg-white text-green-600 rounded-full font-bold hover:bg-gray-100 transition-colors"
-            onClick={() => router.push('/get-start')}
-          >
-            Play Again
-          </button>
-          <button
-            className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-full font-bold hover:bg-white/10 transition-colors"
-            onClick={() => router.push('/')}
-          >
-            Exit Game
-          </button>
+      {/* Animated Trophy */}
+      <div className="mt-8 mb-12">
+        <div className="w-24 h-24 md:w-32 md:h-32 text-7xl rounded-full flex items-center justify-center shadow-lg animate-bounce">
+          😀
         </div>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <Link
+          href="get-start"
+          className="px-8 py-3 bg-gradient-to-r from-teal-400 to-cyan-500 text-white font-bold text-lg rounded-full shadow-lg hover:scale-105 transform transition-transform"
+        >
+          Play Again
+        </Link>
+        <Link
+          href="/"
+          className="px-8 py-3 bg-transparent border-2 border-teal-400 text-teal-400 font-bold text-lg rounded-full hover:bg-teal-400 hover:text-white transition-all"
+        >
+          Exit Game
+        </Link>
       </div>
     </div>
   )

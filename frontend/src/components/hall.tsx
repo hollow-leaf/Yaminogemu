@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { handleSendTransaction } from '@/hooks/useSendTransaction'
+import { SendTransaction } from '@/hooks/SolanaHook'
 
 const hall_data = [
   [
@@ -29,7 +29,12 @@ const hall_data = [
 
 export default function Hall() {
   const { primaryWallet } = useDynamicContext()
-
+  const handleSendTransaction = () => {
+    SendTransaction(
+      primaryWallet || null,
+      'ApWyxz5L6WRCGXxQ8uwThz8ppxvdFrQDQDp9sHF4qWGC'
+    )
+  }
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[90%] max-w-[400px] md:max-w-[600px] lg:max-w-[800px] aspect-[9/16] md:aspect-[12/16] lg:aspect-[14/16] rounded-xl p-6">
@@ -76,12 +81,7 @@ export default function Hall() {
             </button>
           </Link>
           <button
-            onClick={() =>
-              handleSendTransaction(
-                primaryWallet || null,
-                'ApWyxz5L6WRCGXxQ8uwThz8ppxvdFrQDQDp9sHF4qWGC'
-              )
-            }
+            onClick={handleSendTransaction}
             className="w-full bg-white text-blue-500 font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90"
           >
             Test Send 0.01 sol

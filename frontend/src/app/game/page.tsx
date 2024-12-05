@@ -7,7 +7,7 @@ export default function Home() {
   const isLoggedIn = useIsLoggedIn()
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-skyblue1 via-skyblue2 to-skyblue3">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-blue-900 via-purple-900 to-gray-900">
       {isLoggedIn ? <Game /> : <Link href="/">Back to login or signup</Link>}
     </div>
   )

@@ -1,33 +1,40 @@
 'use client'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function Defeat() {
-  const router = useRouter()
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-gradient-to-b from-red-600 to-red-800 text-white p-8 rounded-lg shadow-2xl">
-      <div className="mb-8 text-center">
-        <h2 className="text-6xl font-bold mb-4 animate-bounce">Defeat!</h2>
-        <p className="text-xl opacity-80">
-          You lost the game. Better luck next time!
+    <div className="flex flex-col items-center justify-center bg-gradient-to-b from-gray-800 via-red-700 to-red-900 text-white p-8 rounded-xl">
+      {/* Defeat Banner */}
+      <div className="text-center">
+        <h2 className="text-5xl md:text-7xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-500 animate-pulse">
+          Defeat!
+        </h2>
+        <p className="text-xl md:text-2xl font-light opacity-80">
+          The battle is lost. Don’t give up!
         </p>
       </div>
 
-      <div className="flex flex-col items-center gap-4">
-        <p className="text-lg font-semibold">Want to try again?</p>
-        <div className="flex gap-4">
-          <button
-            className="px-6 py-3 bg-white text-red-600 rounded-full font-bold hover:bg-gray-100 transition-colors"
-            onClick={() => router.push('/get-start')}
-          >
-            Play Again
-          </button>
-          <button
-            className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-full font-bold hover:bg-white/10 transition-colors"
-            onClick={() => router.push('/')}
-          >
-            Exit Game
-          </button>
+      {/* Animated Broken Shield */}
+      <div className="mt-8 mb-12">
+        <div className="w-24 h-24 md:w-32 md:h-32 text-7xl rounded-full flex items-center justify-center shadow-lg animate-bounce">
+          😢
         </div>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <Link
+          href="/get-start"
+          className="px-8 py-3 bg-gradient-to-r from-red-400 to-red-600 text-white font-bold text-lg rounded-full shadow-lg hover:scale-105 transform transition-transform text-center"
+        >
+          Try Again
+        </Link>
+        <Link
+          href="/"
+          className="px-8 py-3 bg-transparent border-2 border-red-400 text-red-400 font-bold text-lg rounded-full hover:bg-red-400 hover:text-white transition-all text-center"
+        >
+          Exit Game
+        </Link>
       </div>
     </div>
   )
