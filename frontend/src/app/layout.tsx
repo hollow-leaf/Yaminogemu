@@ -17,7 +17,10 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: 'Yaminogemu',
   description: 'A web3 game with staking tokens',
-  manifest: '/manifest.json'
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico'
+  }
 }
 
 export default function RootLayout({

@@ -5,7 +5,6 @@ import { createConfig, WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http } from 'viem'
 import { mainnet } from 'viem/chains'
-import { EthereumWalletConnectors } from '@dynamic-labs/ethereum'
 import { SolanaWalletConnectors } from '@dynamic-labs/solana'
 
 const config = createConfig({
@@ -23,7 +22,7 @@ export default function App({ children }: { children: React.ReactNode }) {
     <DynamicContextProvider
       settings={{
         environmentId: '7cacb7db-3d2f-424b-b5f9-27e28c559427',
-        walletConnectors: [EthereumWalletConnectors, SolanaWalletConnectors]
+        walletConnectors: [SolanaWalletConnectors]
       }}
     >
       <WagmiProvider config={config}>
