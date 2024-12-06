@@ -1,0 +1,12 @@
+{
+    "name": "MEMEDOGE",
+    "symbol": "MemeDoge",
+    "description": "meme doge on solana",
+    "image": "https://gateway.pinata.cloud/ipfs/bafybeigd7j756gv5kipsro7tlgub3h2vi6u3mfpfyhs3ljmakjxj2mkc4u",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }

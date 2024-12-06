@@ -1,0 +1,12 @@
+{
+    "name": "PEPE",
+    "symbol": "Pepe",
+    "description": "Pepe pig",
+    "image": "https://gateway.pinata.cloud/ipfs/bafkreih4i635wgabdgfpsmh5napmzorslrmfw32w5a4hvmk7gcdowpyouy",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }
