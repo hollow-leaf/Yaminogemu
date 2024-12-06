@@ -70,9 +70,14 @@ describe("tbw_yaminogemu", () => {
     Keypair.generate()
   );
 
-  const mintM = new PublicKey("7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa")
-  const mintT = new PublicKey("C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id")
+  const mintOPOZ = new PublicKey("7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa")
+  const mintOPOS = new PublicKey("C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id")
+  const mintPepe = new PublicKey("GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd")
+  const mintBabyDoge = new PublicKey("2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc")
   const mintBonk = new PublicKey("Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG")
+
+  const mintM = mintBabyDoge
+  const mintT = mintPepe
 
   // // Metadata to store in Mint Account
   // const metaDataBonk: TokenMetadata = {
@@ -82,26 +87,6 @@ describe("tbw_yaminogemu", () => {
   //   symbol: "bonk",
   //   uri: "https://gateway.pinata.cloud/ipfs/Qmd3FfsyaGfR2yrnNNCxreMKkvn9ByjsL3Te2CG2ozVM89",
   //   additionalMetadata: [["description", "Only Possible On Bonk"]],
-  // };
-
-  // // Metadata to store in Mint Account
-  // const metaDataSol: TokenMetadata = {
-  //   updateAuthority: provider.publicKey,
-  //   mint: mintM,
-  //   name: "OPOS",
-  //   symbol: "OPOS",
-  //   uri: "https://gateway.pinata.cloud/ipfs/QmWwzuHwYvpahsN3jQuvS7yPT3zMrdE4iw8ucStjEAAYFo",
-  //   additionalMetadata: [["description", "Only Possible On Solana"]],
-  // };
-
-  // // Metadata to store in Mint Account
-  // const metaDataZeus: TokenMetadata = {
-  //   updateAuthority: provider.publicKey,
-  //   mint: mintT,
-  //   name: "OPOZ",
-  //   symbol: "OPOZ",
-  //   uri: "https://gateway.pinata.cloud/ipfs/QmSF4qYjNJ6VgR4wBq5Ej6aMFZSy19JHQLXQSXu2MMRwec",
-  //   additionalMetadata: [["description", "Only Possible On Zeus"]],
   // };
 
   const [makerAtaM, makerAtaT, makerAtaBonk, takerAtaM, takerAtaT, takerAtaBonk, ownerAtaM, ownerAtaT, ownerAtaBonk] = [maker, taker, owner]
@@ -250,7 +235,7 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  xit("Add", async () => {
+  it("Add", async () => {
     await program.methods
       .add(new BN(4), new BN(85))
       .accountsStrict({
@@ -266,7 +251,7 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  xit("Add", async () => {
+  it("Add", async () => {
     await program.methods
       .add(new BN(2), new BN(95))
       .accountsStrict({
