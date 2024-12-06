@@ -1,15 +1,26 @@
 'use client'
-
+import React, { useState } from 'react'
+import * as anchor from '@coral-xyz/anchor'
+import { Program, BN } from '@coral-xyz/anchor'
+import { TbwYaminogemu } from '@/idl/tbw_yaminogemu'
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
+import { DepositTransaction } from '@/hooks/SolanaHook'
 import Link from 'next/link'
 
 export default function DeFiStakingPage() {
-  // 模擬數據，可以替換為 API 獲取的數據
+  const [amount, setAmount] = useState(0)
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(Number(e.target.value)) // Update the amount state with the input value
+  }
+
+  const { primaryWallet } = useDynamicContext()
   const tokens = [
-    { symbol: 'BTC', balance: 12.5, apr: '8.5%' },
-    { symbol: 'ETH', balance: 8.3, apr: '6.0%' },
-    { symbol: 'SOL', balance: 20.1, apr: '10.2%' },
-    { symbol: 'BNB', balance: 5.8, apr: '7.5%' },
-    { symbol: 'ADA', balance: 15.7, apr: '9.8%' }
+    { symbol: 'BTC' },
+    { symbol: 'ETH' },
+    { symbol: 'SOL' },
+    { symbol: 'BNB' },
+    { symbol: 'ADA' }
   ]
 
   return (
@@ -35,16 +46,13 @@ export default function DeFiStakingPage() {
               <span className="text-lg md:text-xl font-bold text-cyan-400">
                 {token.symbol}
               </span>
-              <span className="text-gray-400 text-sm md:text-base">
-                Balance: {token.balance}
-              </span>
             </div>
             <div className="text-right">
-              <span className="block text-cyan-400 text-sm md:text-base">
-                APR: {token.apr}
+              <span className="block text-cyan-400  text-sm md:text-base">
+                Balance: {token.symbol} 0.00
               </span>
               <button className="mt-2 bg-cyan-500 text-white py-1 px-4 rounded-full text-sm md:text-base hover:bg-cyan-600 transition-colors">
-                Stake
+                Withdraw
               </button>
             </div>
           </div>
@@ -53,11 +61,19 @@ export default function DeFiStakingPage() {
 
       {/* Footer */}
       <footer className="mt-12 text-center">
-        <Link href="/defi">
-          <button className="w-full bg-cyan-500 py-3 md:py-4 rounded-full font-medium text-sm md:text-base hover:bg-cyan-600 transition-colors">
-            View Staking Rewards
-          </button>
-        </Link>
+        <input
+          type="number"
+          value={amount}
+          onChange={handleInputChange}
+          className="mb-4 w-full text-black py-2 md:py-3 rounded-md border border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          placeholder="Enter amount to stake"
+        />
+        <button
+          onClick={() => DepositTransaction(primaryWallet || null, amount)}
+          className="mb-4 w-full bg-cyan-500 py-3 md:py-4 rounded-full font-medium text-sm md:text-base hover:bg-cyan-600 transition-colors"
+        >
+          Stake Bonk
+        </button>
       </footer>
 
       {/* Bottom Navigation */}
