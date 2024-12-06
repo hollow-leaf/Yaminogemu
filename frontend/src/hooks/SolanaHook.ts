@@ -1,5 +1,5 @@
 import * as anchor from '@coral-xyz/anchor'
-import { Program, BN } from '@coral-xyz/anchor'
+import { BN } from '@coral-xyz/anchor'
 import TbwYaminogemuJson from '@/idl/tbw_yaminogemu.json'
 import { type TbwYaminogemu } from '@/idl/tbw_yaminogemu'
 import { Wallet } from '@dynamic-labs/sdk-react-core'
@@ -13,27 +13,27 @@ import {
   Transaction
 } from '@solana/web3.js'
 import {
-  ExtensionType,
+  // ExtensionType,
   ASSOCIATED_TOKEN_PROGRAM_ID,
-  MINT_SIZE,
-  MetadataPointerInstruction,
+  // MINT_SIZE,
+  // MetadataPointerInstruction,
   TOKEN_2022_PROGRAM_ID,
-  getMintLen,
-  createAssociatedTokenAccountIdempotentInstruction,
-  createInitializeMetadataPointerInstruction,
-  createInitializeMint2Instruction,
-  createMintToInstruction,
-  getAssociatedTokenAddressSync,
-  getMinimumBalanceForRentExemptMint,
-  TYPE_SIZE,
-  LENGTH_SIZE
+  // getMintLen,
+  // createAssociatedTokenAccountIdempotentInstruction,
+  // createInitializeMetadataPointerInstruction,
+  // createInitializeMint2Instruction,
+  // createMintToInstruction,
+  getAssociatedTokenAddressSync
+  // getMinimumBalanceForRentExemptMint,
+  // TYPE_SIZE,
+  // LENGTH_SIZE
 } from '@solana/spl-token'
-const mintOPOZ = new PublicKey('7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa')
-const mintOPOS = new PublicKey('C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id')
-const mintPepe = new PublicKey('GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd')
-const mintBabyDoge = new PublicKey(
-  '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc'
-)
+// const mintOPOZ = new PublicKey('7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa')
+// const mintOPOS = new PublicKey('C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id')
+// const mintPepe = new PublicKey('GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd')
+// const mintBabyDoge = new PublicKey(
+//   '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc'
+// )
 const mintBonk = new PublicKey('Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG')
 
 // send 0.01 sol to destination address

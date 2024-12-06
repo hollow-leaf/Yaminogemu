@@ -84,7 +84,7 @@ export default function Hall() {
             onClick={handleSendTransaction}
             className="w-full bg-white text-blue-500 font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90"
           >
-            Test Send 0.01 sol
+            Test Send 10 sol
           </button>
         </div>
       </div>

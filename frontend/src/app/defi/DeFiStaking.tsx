@@ -28,10 +28,10 @@ export default function DeFiStakingPage() {
       {/* Header */}
       <header className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-cyan-400">
-          💎 DeFi Staking
+          💎 Meme Liquidity Pool
         </h1>
         <p className="text-gray-400 text-sm md:text-base mt-2">
-          Stake your tokens and earn rewards effortlessly.
+          Stake your BONKs and earn rewards effortlessly.
         </p>
       </header>
 
@@ -46,10 +46,13 @@ export default function DeFiStakingPage() {
               <span className="text-lg md:text-xl font-bold text-cyan-400">
                 {token.symbol}
               </span>
+              <span className="text-sm md:text-xl font-bold text-white">
+                ratio : 2
+              </span>
             </div>
             <div className="text-right">
               <span className="block text-cyan-400  text-sm md:text-base">
-                Balance: {token.symbol} 0.00
+                Balance: 0.00
               </span>
               <button className="mt-2 bg-cyan-500 text-white py-1 px-4 rounded-full text-sm md:text-base hover:bg-cyan-600 transition-colors">
                 Withdraw
@@ -74,6 +77,7 @@ export default function DeFiStakingPage() {
         >
           Stake Bonk
         </button>
+        Staking Amount : 14.00
       </footer>
 
       {/* Bottom Navigation */}
