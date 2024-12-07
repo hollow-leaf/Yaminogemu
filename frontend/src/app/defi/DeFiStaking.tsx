@@ -1,23 +1,106 @@
 'use client'
 import React, { useState } from 'react'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { DepositTransaction } from '@/hooks/SolanaHook'
+import { SolanaTransactionService } from '@/hooks/solanahook'
+import { SolanaWallet } from '@dynamic-labs/solana-core'
 import Link from 'next/link'
+import { X } from 'lucide-react'
 
 export default function DeFiStakingPage() {
   const [amount, setAmount] = useState(0)
+  const [isOpen, setIsOpen] = useState(false)
+  const [withdrawToken, setWithdrawToken] = useState('')
 
+  const toggleOpen = () => {
+    setIsOpen(!isOpen)
+  }
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(Number(e.target.value)) // Update the amount state with the input value
   }
+  const handleWithdrawWindows = (itemName: string) => {
+    toggleOpen()
+    setWithdrawToken(itemName)
+  }
 
   const { primaryWallet } = useDynamicContext()
+
+  const handleDeposit = async () => {
+    if (!primaryWallet) {
+      console.error('Wallet not available')
+      return
+    }
+
+    const transaction = new SolanaTransactionService(
+      primaryWallet as SolanaWallet
+    )
+    try {
+      await transaction.depositTransaction(amount)
+      console.log('Deposit sent')
+    } catch (error) {
+      console.error('Error sending transaction:', error)
+    }
+  }
+
+  const handleWithdraw = async () => {
+    if (!primaryWallet) {
+      console.error('Wallet not available')
+      return
+    }
+
+    const transaction = new SolanaTransactionService(
+      primaryWallet as SolanaWallet
+    )
+    switch (withdrawToken) {
+      case 'BONK':
+        try {
+          await transaction.withdrawBonk(amount)
+          console.log('Deposit sent')
+        } catch (error) {
+          console.error('Error sending transaction:', error)
+        }
+        break
+      case 'MEMEDOGE':
+        try {
+          await transaction.withdrawMemeDoge(amount)
+          console.log('Deposit sent')
+        } catch (error) {
+          console.error('Error sending transaction:', error)
+        }
+        break
+      case 'OPOS':
+        try {
+          await transaction.withdrawOPOS(amount)
+          console.log('Deposit sent')
+        } catch (error) {
+          console.error('Error sending transaction:', error)
+        }
+        break
+      case 'OPOZ':
+        try {
+          await transaction.withdrawOPOZ(amount)
+          console.log('Deposit sent')
+        } catch (error) {
+          console.error('Error sending transaction:', error)
+        }
+        break
+      case 'PEPE':
+        try {
+          await transaction.withdrawPepe(amount)
+          console.log('Deposit sent')
+        } catch (error) {
+          console.error('Error sending transaction:', error)
+        }
+        break
+      default:
+        console.log('Your token is not exist!')
+    }
+  }
   const tokens = [
-    { symbol: 'BTC' },
-    { symbol: 'ETH' },
-    { symbol: 'SOL' },
-    { symbol: 'BNB' },
-    { symbol: 'ADA' }
+    { symbol: 'BONK' },
+    { symbol: 'MEMEDOGE' },
+    { symbol: 'OPOS' },
+    { symbol: 'OPOZ' },
+    { symbol: 'PEPE' }
   ]
 
   return (
@@ -51,7 +134,10 @@ export default function DeFiStakingPage() {
               <span className="block text-cyan-400  text-sm md:text-base">
                 Balance: 0.00
               </span>
-              <button className="mt-2 bg-cyan-500 text-white py-1 px-4 rounded-full text-sm md:text-base hover:bg-cyan-600 transition-colors">
+              <button
+                onClick={() => handleWithdrawWindows(token.symbol)}
+                className="mt-2 bg-cyan-500 text-white py-1 px-4 rounded-full text-sm md:text-base hover:bg-cyan-600 transition-colors"
+              >
                 Withdraw
               </button>
             </div>
@@ -63,13 +149,13 @@ export default function DeFiStakingPage() {
       <footer className="mt-12 text-center">
         <input
           type="number"
-          value={amount}
+          min={0}
           onChange={handleInputChange}
-          className="mb-4 w-full text-black py-2 md:py-3 rounded-md border border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="mb-4 w-full text-black py-2 md:py-3 rounded-xl border border-gray-300 text-center focus:outline-none focus:ring-2 focus:ring-cyan-500"
           placeholder="Enter amount to stake"
         />
         <button
-          onClick={() => DepositTransaction(primaryWallet || null, amount)}
+          onClick={handleDeposit}
           className="mb-4 w-full bg-cyan-500 py-3 md:py-4 rounded-full font-medium text-sm md:text-base hover:bg-cyan-600 transition-colors"
         >
           Stake Bonk
@@ -94,6 +180,41 @@ export default function DeFiStakingPage() {
           </Link>
         </div>
       </div>
+
+      {/* Modal */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={toggleOpen}
+        >
+          <section
+            className="bg-white text-black border-4 border-cyan-400 p-3 rounded-xl shadow-lg w-2/3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-end">
+              <X
+                onClick={toggleOpen}
+                className="hover:rotate-90 duration-300"
+              />
+            </div>
+            <h2 className="text-lg font-bold">Withdraw</h2>
+            <p className="mt-2">Enter the amount you wish to withdraw.</p>
+            <input
+              type="number"
+              className="mt-4 w-full py-2 px-3 border rounded-md"
+              placeholder="Amount"
+            />
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleWithdraw}
+                className="bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-cyan-600"
+              >
+                Confirm
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   )
 }

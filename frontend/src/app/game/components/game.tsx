@@ -3,10 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import Victory from './victory'
 import Defeat from './defeat'
+import Link from 'next/link'
 
 export default function KnowledgeKing() {
   const [player1Score, setPlayer1Score] = useState(0)
   const [player2Score, setPlayer2Score] = useState(0)
+  const [player1CorrectAnswers, setPlayer1CorrectAnswers] = useState(0) // 玩家1答對題數
+  const [player2CorrectAnswers, setPlayer2CorrectAnswers] = useState(0) // 玩家2答對題數
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [timeLeft, setTimeLeft] = useState(10) // 每題10秒
   const [isGameOver, setIsGameOver] = useState(false)
@@ -77,8 +80,10 @@ export default function KnowledgeKing() {
     if (isCorrect) {
       if (player === 1) {
         setPlayer1Score((prev) => prev + 20)
+        setPlayer1CorrectAnswers((prev) => prev + 1)
       } else {
         setPlayer2Score((prev) => prev + 20)
+        setPlayer2CorrectAnswers((prev) => prev + 1)
       }
     }
 
@@ -110,7 +115,7 @@ export default function KnowledgeKing() {
   }, [timeLeft, handleNextQuestion])
 
   return (
-    <div className="flex items-center justify-between min-h-screen text-white p-4">
+    <div className="flex flex-col items-center justify-between min-h-screen text-white p-4">
       {isGameOver ? (
         <div className="text-center w-full">
           {isTie ? (
@@ -139,66 +144,58 @@ export default function KnowledgeKing() {
           )}
         </div>
       ) : (
-        <>
-          {/* 玩家1 */}
-          <div className="flex flex-col items-center gap-4">
-            <h2 className="text-xl font-bold">Player 1</h2>
-            <div className="w-12 bg-gray-800 rounded-lg h-64 relative">
-              <div
-                className="bg-blue-500 w-full rounded-lg absolute bottom-0"
-                style={{
-                  height: `${(player1Score / (questions.length * 20)) * 100}%`
-                }}
-              ></div>
-            </div>
-            <span className="text-lg font-medium">{player1Score} points</span>
-            {questions[currentQuestion].options.map((option, index) => (
-              <button
-                key={`p1-${index}`}
-                onClick={() => handleAnswer(1, index)}
-                className={`py-2 px-4 rounded-lg text-sm transition-colors ${
-                  clickedButtons[`player1-${index}`]
-                    ? 'bg-blue-700 text-gray-200'
-                    : 'bg-gray-700 hover:bg-blue-500'
-                }`}
-                disabled={answeredFirst}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-
+        <div className="flex flex-col items-center gap-6">
           {/* 問題區塊 */}
-          <div className="flex-1 flex flex-col items-center gap-6 mx-8">
+          <div className="mt-8 text-center">
             <h2 className="text-lg font-semibold text-gray-400">
               Question {currentQuestion + 1} of {questions.length}
             </h2>
-            <h1 className="text-md md:text-2xl font-bold text-center break-words w-full max-w-[90%] mx-auto">
+            <h1 className="text-2xl md:text-3xl font-bold text-center break-words mt-2">
               {questions[currentQuestion].question}
             </h1>
-            <p className="text-gray-300 text-sm">Time left: {timeLeft}s</p>
+            <p className="text-gray-300 text-sm mt-2">Time left: {timeLeft}s</p>
           </div>
 
-          {/* 玩家2 */}
-          <div className="flex flex-col items-center gap-4">
-            <h2 className="text-xl font-bold">Player 2</h2>
-            <div className="w-12 bg-gray-800 rounded-lg h-64 relative">
+          {/* 玩家1進度條 */}
+          <div className="w-full max-w-lg">
+            <div className="text-center text-sm font-medium">
+              Player 1 Progress
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-4 mt-2">
               <div
-                className="bg-yellow-500 w-full rounded-lg absolute bottom-0"
+                className="bg-blue-500 h-full rounded-full"
                 style={{
-                  height: `${(player2Score / (questions.length * 20)) * 100}%`
+                  width: `${(player1CorrectAnswers / questions.length) * 100}%`
                 }}
               ></div>
             </div>
-            <span className="text-lg font-medium">{player2Score} points</span>
+          </div>
+
+          {/* 玩家2進度條 */}
+          <div className="w-full max-w-lg mt-4">
+            <div className="text-center text-sm font-medium">
+              Player 2 Progress
+            </div>
+            <div className="w-full bg-gray-700 rounded-full h-4 mt-2">
+              <div
+                className="bg-yellow-500 h-full rounded-full"
+                style={{
+                  width: `${(player2CorrectAnswers / questions.length) * 100}%`
+                }}
+              ></div>
+            </div>
+          </div>
+
+          {/* 選項 */}
+          <div className="grid grid-cols-1 gap-4 w-full max-w-md mt-8">
             {questions[currentQuestion].options.map((option, index) => (
               <button
-                key={`p2-${index}`}
-                onClick={() => handleAnswer(2, index)}
-                className={`py-2 px-4 rounded-lg text-sm transition-colors ${
-                  clickedButtons[`player2-${index}`]
-                    ? 'bg-yellow-700 text-gray-200'
-                    : 'bg-gray-700 hover:bg-yellow-500'
+                key={`option-${index}`}
+                onClick={() => handleAnswer(1, index)}
+                className={`py-2 px-4 rounded-lg text-sm font-medium text-center bg-gray-700 hover:bg-cyan-500 transition-colors ${
+                  clickedButtons[`player1-${index}`]
+                    ? 'bg-blue-700 text-gray-200'
+                    : ''
                 }`}
                 disabled={answeredFirst}
               >
@@ -206,7 +203,24 @@ export default function KnowledgeKing() {
               </button>
             ))}
           </div>
-        </>
+          {/* Bottom Navigation */}
+          <div className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 py-3">
+            <div className="flex justify-around items-center max-w-screen-xl mx-auto">
+              <Link href="/" className="flex flex-col items-center">
+                <span className="text-2xl text-cyan-400">🏠</span>
+                <span className="text-xs text-gray-400">Home</span>
+              </Link>
+              <Link href="/token-list" className="flex flex-col items-center">
+                <span className="text-2xl text-cyan-400">📊</span>
+                <span className="text-xs text-gray-400">Token List</span>
+              </Link>
+              <Link href="/defi" className="flex flex-col items-center">
+                <span className="text-2xl text-cyan-400">💎</span>
+                <span className="text-xs text-gray-400">DeFi</span>
+              </Link>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
