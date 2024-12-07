@@ -55,6 +55,14 @@ export default function KnowledgeKing() {
     }
   ]
 
+  // 判斷最終結果
+  const checkGameResult = useCallback(() => {
+    setIsGameOver(true)
+    if (player1Score === player2Score) {
+      setIsTie(true)
+    }
+  }, [player1Score, player2Score])
+
   // 處理答案選擇
   const handleAnswer = (player: 1 | 2, optionIndex: number) => {
     if (answeredFirst) return
@@ -75,13 +83,6 @@ export default function KnowledgeKing() {
     }
 
     setTimeout(handleNextQuestion, 1000)
-  }
-  // 判斷最終結果
-  const checkGameResult = () => {
-    setIsGameOver(true)
-    if (player1Score === player2Score) {
-      setIsTie(true)
-    }
   }
 
   // 切換到下一題

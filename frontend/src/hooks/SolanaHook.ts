@@ -6,8 +6,6 @@ import { Wallet } from '@dynamic-labs/sdk-react-core'
 import { ISolana, isSolanaWallet } from '@dynamic-labs/solana-core'
 import {
   Connection,
-  Keypair,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
   Transaction

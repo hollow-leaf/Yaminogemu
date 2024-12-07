@@ -1,8 +1,5 @@
 'use client'
 import React, { useState } from 'react'
-import * as anchor from '@coral-xyz/anchor'
-import { Program, BN } from '@coral-xyz/anchor'
-import { TbwYaminogemu } from '@/idl/tbw_yaminogemu'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
 import { DepositTransaction } from '@/hooks/SolanaHook'
 import Link from 'next/link'
