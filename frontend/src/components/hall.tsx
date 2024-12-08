@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { SendTransaction } from '@/hooks/SolanaHook'
+import { SolanaTransactionService } from '@/hooks/solanahook'
+import { SolanaWallet } from '@dynamic-labs/solana-core'
 
 const hall_data = [
   [
@@ -29,12 +30,26 @@ const hall_data = [
 
 export default function Hall() {
   const { primaryWallet } = useDynamicContext()
-  const handleSendTransaction = () => {
-    SendTransaction(
-      primaryWallet || null,
-      'ApWyxz5L6WRCGXxQ8uwThz8ppxvdFrQDQDp9sHF4qWGC'
+  const handleSend = async () => {
+    if (!primaryWallet) {
+      console.error('Wallet not available')
+      return
+    }
+
+    const transaction = new SolanaTransactionService(
+      primaryWallet as SolanaWallet
     )
+    try {
+      await transaction.sendTransaction(
+        'ApWyxz5L6WRCGXxQ8uwThz8ppxvdFrQDQDp9sHF4qWGC',
+        0.01
+      )
+      console.log('Transaction sent')
+    } catch (error) {
+      console.error('Error sending transaction:', error)
+    }
   }
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[90%] max-w-[400px] md:max-w-[600px] lg:max-w-[800px] aspect-[9/16] md:aspect-[12/16] lg:aspect-[14/16] rounded-xl p-6">
@@ -81,11 +96,29 @@ export default function Hall() {
             </button>
           </Link>
           <button
-            onClick={handleSendTransaction}
+            onClick={handleSend}
             className="w-full bg-white text-blue-500 font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90"
           >
             Test Send 10 sol
           </button>
+        </div>
+
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
+          <div className="flex justify-around items-center max-w-screen-xl mx-auto">
+            <Link href="/" className="flex flex-col items-center">
+              <span className="text-2xl">🏠</span>
+              <span className="text-xs text-gray-600">Home</span>
+            </Link>
+            <Link href="/token-list" className="flex flex-col items-center">
+              <span className="text-2xl">📊</span>
+              <span className="text-xs text-gray-600">Token list</span>
+            </Link>
+            {/* open windows and do something with dynamic wallet */}
+            <Link href="/defi" className="flex flex-col items-center">
+              <span className="text-2xl">💎</span>
+              <span className="text-xs text-gray-600">DeFi</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
