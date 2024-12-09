@@ -1,5 +1,5 @@
-import { twMerge } from "tailwind-merge"
-import { clsx, type ClassValue } from "clsx"
+import { twMerge } from 'tailwind-merge'
+import { clsx, type ClassValue } from 'clsx'
 
 export const stringify: typeof JSON.stringify = (value, replacer, space) =>
   JSON.stringify(
@@ -25,7 +25,7 @@ export function formatAddress(address: string) {
 }
 
 export function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export function cn(...inputs: ClassValue[]) {

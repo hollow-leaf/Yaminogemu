@@ -26,9 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${PoetsenOne.variable} antialiased bg-custom-gradient`}
-      >
+      <body className={`${PoetsenOne.variable} antialiased bg-custom-gradient`}>
         <DynamicConfig>
           {children}
           <ClientSideSelectBottom />
