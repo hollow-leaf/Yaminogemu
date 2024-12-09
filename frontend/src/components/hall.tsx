@@ -25,7 +25,6 @@ const hall_data = [
 ]
 
 export default function Hall() {
-
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-[90%] max-w-[400px] md:max-w-[600px] lg:max-w-[800px] aspect-[9/16] md:aspect-[12/16] lg:aspect-[14/16] rounded-xl p-6">
