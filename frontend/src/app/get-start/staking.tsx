@@ -161,62 +161,57 @@ export default function Staking() {
   }
 
   return (
-    <div className="w-full max-w-[400px] md:max-w-[600px] lg:max-w-[800px] p-4 md:p-6 lg:p-8 mb-16">
-      <div className="flex items-center gap-2 mb-3 md:mb-4">
-        <span className="text-sm md:text-sm lg:text-base text-gray-500">
+    <div className="w-full max-w-[400px] md:max-w-[600px] lg:max-w-[800px] p-6 md:p-8 lg:p-10 mb-16 bg-white shadow-lg rounded-2xl border border-gray-200">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <span className="text-sm md:text-base text-gray-500">
           Hi <br />
           {primaryWallet?.address ? formatAddress(primaryWallet.address) : ''}
         </span>
-        <span className="text-lg md:text-xl lg:text-2xl">👋</span>
+        <span className="text-2xl md:text-3xl lg:text-4xl">👋</span>
       </div>
 
-      <h1 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6">
+      {/* Title */}
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-gray-800">
         Let&apos;s Play
       </h1>
 
-      <div className="flex justify-between mb-6 md:mb-8">
-        <div className="flex items-center gap-2">
-          <span className="text-lg md:text-xl lg:text-2xl text-yellow-400">
-            🕹️
-          </span>
+      {/* Info Section */}
+      <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg shadow-sm border">
+          <span className="text-yellow-400 text-2xl">🕹️</span>
           <div>
-            <p className="font-bold text-base md:text-lg lg:text-xl">{chain}</p>
-            <p className="text-xs md:text-xs lg:text-sm text-gray-500">
-              Current chain
-            </p>
+            <p className="font-bold text-lg text-gray-800">{chain}</p>
+            <p className="text-sm text-gray-500">Current chain</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-lg md:text-xl lg:text-2xl text-yellow-400">
-            🪙
-          </span>
-          <div className="flex gap-2">
-            <span className="font-bold text-base md:text-lg lg:text-xl">
-              {balance}
-            </span>
-            <span className="font-bold text-base md:text-lg lg:text-xl">
-              {chain}
-            </span>
+        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg shadow-sm border">
+          <span className="text-yellow-400 text-2xl">🪙</span>
+          <div>
+            <p className="font-bold text-lg text-gray-800">{balance}</p>
+            <p className="text-sm text-gray-500">Balance</p>
           </div>
         </div>
       </div>
-      <div className="flex items-center mb-6 md:mb-4">
-        <div className="space-y-6">
-          <p className="font-bold text-2xl md:text-4xl">How to play?</p>
-          <ul className="space-y-2 text-pretty">
-            <li>1. Click Start !</li>
-            <li>2. Select your token, that you would like to stake.</li>
-            <li>3. Enjoy your game.</li>
-          </ul>
-        </div>
+
+      {/* Instructions */}
+      <div className="mb-8">
+        <p className="text-xl md:text-2xl font-bold mb-4">How to play?</p>
+        <ul className="space-y-3 text-gray-700">
+          <li>1. Click Start!</li>
+          <li>2. Select your token that you would like to stake.</li>
+          <li>3. Enjoy your game.</li>
+        </ul>
       </div>
-      <div className="flex my-48" />
+
+      {/* Start Button */}
       <button
         onClick={toggleOpen}
-        className="w-full bg-cyan-400 text-white py-3 md:py-4 rounded-full font-medium text-sm md:text-base lg:text-lg hover:bg-cyan-500 transition-colors"
+        className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white py-4 rounded-full font-medium text-lg hover:from-cyan-500 hover:to-blue-600 transition-transform transform hover:scale-105"
       >
         Start
       </button>
+
       {/* Modal */}
       {isOpen && (
         <div
@@ -224,25 +219,25 @@ export default function Staking() {
           onClick={toggleOpen}
         >
           <section
-            className="bg-white text-black border-4 border-cyan-400 p-3 rounded-xl shadow-lg w-2/3"
+            className="bg-white text-gray-800 border-2 border-cyan-400 p-6 rounded-xl shadow-lg w-[90%] max-w-md transform transition-all duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-end">
               <X
                 onClick={toggleOpen}
-                className="hover:rotate-90 duration-300"
+                className="text-gray-400 hover:text-gray-600 cursor-pointer transition-transform transform hover:rotate-90 duration-300"
               />
             </div>
-            <h2 className="text-lg font-bold">Let&rsquo;s start</h2>
-            <p className="mt-2">
+            <h2 className="text-lg font-bold mb-4">Let&rsquo;s start</h2>
+            <p className="mb-4">
               Select staking token & Enter the amount you wish to stake.
             </p>
 
-            {/* Select box with 5 options */}
+            {/* Token Select */}
             <select
               value={selectedOption}
               onChange={(e) => setSelectedOption(e.currentTarget.value)}
-              className="mt-4 w-full py-2 px-3 border rounded-md"
+              className="w-full py-2 px-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400"
             >
               <option value="Bonk">Bonk</option>
               <option value="MemeDoge">MemeDoge</option>
@@ -251,18 +246,20 @@ export default function Staking() {
               <option value="Pepe">Pepe</option>
             </select>
 
+            {/* Amount Input */}
             <input
               type="number"
               min={0}
               onChange={(e) => setAmount(e.target.value)}
-              className="mt-4 w-full py-2 px-3 border rounded-md"
+              className="mt-4 w-full py-2 px-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400"
               placeholder="Amount"
             />
 
-            <div className="flex justify-end mt-4">
+            {/* Confirm Button */}
+            <div className="flex justify-end mt-6">
               <button
                 onClick={handleStaking}
-                className="bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-cyan-600"
+                className="bg-cyan-500 text-white py-2 px-6 rounded-md hover:bg-cyan-600 transition-transform transform hover:scale-105"
               >
                 Confirm
               </button>
