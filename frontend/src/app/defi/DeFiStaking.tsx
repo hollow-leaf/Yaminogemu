@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
 import { SolanaTransactionService } from '@/hooks/solanahook'
 import { SolanaWallet } from '@dynamic-labs/solana-core'
@@ -10,7 +10,11 @@ export default function DeFiStakingPage() {
   const [amount, setAmount] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
   const [withdrawToken, setWithdrawToken] = useState('BONK')
-
+  const [bonkBalance, setBonkBalance] = useState<number>(0)
+  const [memeDogeBalance, setMemeDogeBalance] = useState<number>(0)
+  const [OPOZBalance, setOPOZBalance] = useState<number>(0)
+  const [OPOSBalance, setOPOSBalance] = useState<number>(0)
+  const [pepeBalance, setPepeBalance] = useState<number>(0)
   const toggleOpen = () => {
     setIsOpen(!isOpen)
   }
@@ -179,12 +183,62 @@ export default function DeFiStakingPage() {
         console.log('Your token is not exist!')
     }
   }
+
+  const fetchTokenBalance = useCallback(async () => {
+    if (!primaryWallet) {
+      console.error('Wallet not available')
+      return
+    }
+
+    const transaction = new SolanaTransactionService(
+      primaryWallet as SolanaWallet
+    )
+
+    try {
+      const balance = await transaction.Balance('Bonk')
+      setBonkBalance(balance)
+    } catch (error) {
+      console.error('Error occurred:', error)
+    }
+    try {
+      const balance = await transaction.Balance('MemeDoge')
+      setMemeDogeBalance(balance)
+    } catch (error) {
+      console.error('Error occurred:', error)
+    }
+    try {
+      const balance = await transaction.Balance('OPOZ')
+      setOPOZBalance(balance)
+    } catch (error) {
+      console.error('Error occurred:', error)
+    }
+    try {
+      const balance = await transaction.Balance('OPOS')
+      setOPOSBalance(balance)
+    } catch (error) {
+      console.error('Error occurred:', error)
+    }
+    try {
+      const balance = await transaction.Balance('Pepe')
+      setPepeBalance(balance)
+    } catch (error) {
+      console.error('Error occurred:', error)
+    }
+  }, [primaryWallet])
+  useEffect(() => {
+    fetchTokenBalance()
+
+    const intervalId = setInterval(() => {
+      fetchTokenBalance()
+    }, 20000) // 20 sec
+    return () => clearInterval(intervalId)
+  }, [fetchTokenBalance])
   const tokens = [
-    { symbol: 'Bonk' },
-    { symbol: 'MemeDoge' },
-    { symbol: 'OPOS' },
-    { symbol: 'OPOZ' },
-    { symbol: 'Pepe' }
+    { symbol: 'Bonk', balance: `${bonkBalance}` },
+    { symbol: 'MemeDoge', balance: `${memeDogeBalance}` },
+    { symbol: 'OPOZ', balance: `${OPOZBalance}` },
+    { symbol: 'OPOS', balance: `${OPOSBalance}` },
+    { symbol: 'Pepe', balance: `${pepeBalance}` }
   ]
 
   return (
@@ -216,7 +270,7 @@ export default function DeFiStakingPage() {
             </div>
             <div className="text-right">
               <span className="block text-cyan-400  text-sm md:text-base">
-                Balance: 0.00
+                Balance: {token.balance}
               </span>
               <button
                 onClick={() => handleWithdrawWindows(token.symbol)}

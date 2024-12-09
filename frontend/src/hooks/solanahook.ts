@@ -840,4 +840,237 @@ export class SolanaTransactionService {
       throw new Error(`Transaction failed: ${error}`)
     }
   }
+
+  // match found and connect two player
+  public async Take(): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const task_id = new BN(randomBytes(8))
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+
+    const [makerAtaBonk] = [ownerKey]
+      .map((a) =>
+        [this.mintBonk].map((m) =>
+          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
+        )
+      )
+      .flat()
+    const [memeRatioBonk] = [this.mintBonk].map(
+      (a) =>
+        PublicKey.findProgramAddressSync(
+          [Buffer.from('meme'), a.toBuffer()],
+          tbwYaminogemuProgram.programId
+        )[0]
+    )
+    const escrow = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('escrow'),
+        ownerKey.toBuffer(),
+        task_id.toArrayLike(Buffer, 'le', 8)
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const vaultBonk = getAssociatedTokenAddressSync(
+      this.mintBonk,
+      escrow,
+      true,
+      this.tokenProgram
+    )
+    const instructions = await tbwYaminogemuProgram.methods
+      .take()
+      .accountsStrict({
+        taker: 'new PublicKey(solana address)', // 對手address
+        maker: ownerKey, // owner address
+        mintMeme: this.mintBonk,
+        takerAtaT: makerAtaBonk,
+        memeRatio: memeRatioBonk,
+        escrow,
+        vaultT: vaultBonk,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: this.tokenProgram,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
+
+  // game winner claim rewards
+  public async CliamRewards(): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const task_id = new BN(randomBytes(8))
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+
+    const [makerAtaBonk] = [ownerKey]
+      .map((a) =>
+        [this.mintBonk].map((m) =>
+          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
+        )
+      )
+      .flat()
+    const [memeRatioBonk] = [this.mintBonk].map(
+      (a) =>
+        PublicKey.findProgramAddressSync(
+          [Buffer.from('meme'), a.toBuffer()],
+          tbwYaminogemuProgram.programId
+        )[0]
+    )
+    const escrow = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('escrow'),
+        ownerKey.toBuffer(),
+        task_id.toArrayLike(Buffer, 'le', 8)
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const ownership = PublicKey.findProgramAddressSync(
+      [Buffer.from('tbw_yaminogemu')],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const vaultBonk = getAssociatedTokenAddressSync(
+      this.mintBonk,
+      escrow,
+      true,
+      this.tokenProgram
+    )
+    const ownershipBonk = getAssociatedTokenAddressSync(
+      this.mintBonk,
+      ownership,
+      true,
+      this.tokenProgram
+    )
+
+    const instructions = await tbwYaminogemuProgram.methods
+      .winnerClaim()
+      .accountsStrict({
+        winner: 'winner publicKey',
+        maker: ownerKey,
+        owner: ownerKey,
+        mintBonk: this.mintBonk,
+        mintMeme: this.mintBonk,
+        mintWin: this.mintBonk,
+        ownership,
+        memeRatio: memeRatioBonk,
+        escrow,
+        winnerAtaWin: makerAtaBonk,
+        winnerAtaBonk: makerAtaBonk,
+        vaultWin: vaultBonk,
+        ownershipBonk,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: this.tokenProgram,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
+
+  public async Balance(tokenName: string): Promise<number> {
+    const connection = await this.getConnection()
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+    const ownership = PublicKey.findProgramAddressSync(
+      [Buffer.from('tbw_yaminogemu'),
+        ownerKey.toBuffer()
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+      switch (tokenName) {
+        case 'Bonk':
+          const ownershipBonk = getAssociatedTokenAddressSync(
+            this.mintBonk,
+            ownership,
+            true,
+            this.tokenProgram,
+            ASSOCIATED_TOKEN_PROGRAM_ID,
+          )
+          const info = await connection.getTokenAccountBalance(ownershipBonk)
+          if (info.value.uiAmount == null) throw new Error('No balance found')
+          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info.value.uiAmount)
+          return info.value.uiAmount
+        case 'MemeDoge':
+          const ownershipMemeDoge = getAssociatedTokenAddressSync(
+            this.mintMemeDoge,
+            ownership,
+            true,
+            this.tokenProgram
+          )
+          const info2 =
+            await connection.getTokenAccountBalance(ownershipMemeDoge)
+          if (info2.value.uiAmount == null) throw new Error('No balance found')
+          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info2.value.uiAmount)
+          return info2.value.uiAmount
+        case 'OPOZ':
+          const ownershipOPOZ = getAssociatedTokenAddressSync(
+            this.mintOPOZ,
+            ownership,
+            true,
+            this.tokenProgram
+          )
+          const info3 = await connection.getTokenAccountBalance(ownershipOPOZ)
+          if (info3.value.uiAmount == null) throw new Error('No balance found')
+          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info3.value.uiAmount)
+          return info3.value.uiAmount
+        case 'OPOS':
+          const ownershipOPOS = getAssociatedTokenAddressSync(
+            this.mintOPOS,
+            ownership,
+            true,
+            this.tokenProgram
+          )
+          const info4 = await connection.getTokenAccountBalance(ownershipOPOS)
+          if (info4.value.uiAmount == null) throw new Error('No balance found')
+          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info4.value.uiAmount)
+          return info4.value.uiAmount
+        case 'Pepe':
+          const ownershipPepe = getAssociatedTokenAddressSync(
+            this.mintPepe,
+            ownership,
+            true,
+            this.tokenProgram
+          )
+          const info5 = await connection.getTokenAccountBalance(ownershipPepe)
+          if (info5.value.uiAmount == null) throw new Error('No balance found')
+          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info5.value.uiAmount)
+          return info5.value.uiAmount
+        default:
+          return 0
+      }
+  }
 }
