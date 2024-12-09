@@ -5,11 +5,11 @@ import Link from 'next/link'
 export default function TokenRankings() {
   // 模擬數據，可以替換為 API 獲取的數據
   const tokens = [
-    { rank: 1, symbol: 'BTC', balance: 12.5 },
-    { rank: 2, symbol: 'ETH', balance: 8.3 },
-    { rank: 3, symbol: 'SOL', balance: 20.1 },
-    { rank: 4, symbol: 'BNB', balance: 5.8 },
-    { rank: 5, symbol: 'ADA', balance: 15.7 }
+    { rank: 1, symbol: 'Jake', balance: 12.5 },
+    { rank: 2, symbol: 'Solo', balance: 8.3 },
+    { rank: 3, symbol: 'Albert', balance: 20.1 },
+    { rank: 4, symbol: 'Sophia', balance: 5.8 },
+    { rank: 5, symbol: 'Kidney', balance: 15.7 }
   ]
 
   return (
@@ -54,24 +54,6 @@ export default function TokenRankings() {
           </button>
         </Link>
       </footer>
-
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
-        <div className="flex justify-around items-center max-w-screen-xl mx-auto">
-          <Link href="/" className="flex flex-col items-center">
-            <span className="text-2xl">🏠</span>
-            <span className="text-xs text-gray-600">Home</span>
-          </Link>
-          <Link href="/token-list" className="flex flex-col items-center">
-            <span className="text-2xl">📊</span>
-            <span className="text-xs text-gray-600">Token list</span>
-          </Link>
-          {/* open windows and do something with dynamic wallet */}
-          <Link href="/defi" className="flex flex-col items-center">
-            <span className="text-2xl">💎</span>
-            <span className="text-xs text-gray-600">DeFi</span>
-          </Link>
-        </div>
-      </div>
     </div>
   )
 }

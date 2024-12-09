@@ -1,9 +1,7 @@
 'use client'
-
 import { useState, useEffect, useCallback } from 'react'
 import Victory from './victory'
 import Defeat from './defeat'
-import Link from 'next/link'
 
 export default function KnowledgeKing() {
   const [player1Score, setPlayer1Score] = useState(0)
@@ -202,23 +200,6 @@ export default function KnowledgeKing() {
                 {option}
               </button>
             ))}
-          </div>
-          {/* Bottom Navigation */}
-          <div className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 py-3">
-            <div className="flex justify-around items-center max-w-screen-xl mx-auto">
-              <Link href="/" className="flex flex-col items-center">
-                <span className="text-2xl text-cyan-400">🏠</span>
-                <span className="text-xs text-gray-400">Home</span>
-              </Link>
-              <Link href="/token-list" className="flex flex-col items-center">
-                <span className="text-2xl text-cyan-400">📊</span>
-                <span className="text-xs text-gray-400">Token List</span>
-              </Link>
-              <Link href="/defi" className="flex flex-col items-center">
-                <span className="text-2xl text-cyan-400">💎</span>
-                <span className="text-xs text-gray-400">DeFi</span>
-              </Link>
-            </div>
           </div>
         </div>
       )}

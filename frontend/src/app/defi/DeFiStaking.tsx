@@ -3,13 +3,13 @@ import React, { useState } from 'react'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
 import { SolanaTransactionService } from '@/hooks/solanahook'
 import { SolanaWallet } from '@dynamic-labs/solana-core'
-import Link from 'next/link'
 import { X } from 'lucide-react'
+import Swal from 'sweetalert2'
 
 export default function DeFiStakingPage() {
   const [amount, setAmount] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
-  const [withdrawToken, setWithdrawToken] = useState('')
+  const [withdrawToken, setWithdrawToken] = useState('BONK')
 
   const toggleOpen = () => {
     setIsOpen(!isOpen)
@@ -34,10 +34,24 @@ export default function DeFiStakingPage() {
       primaryWallet as SolanaWallet
     )
     try {
-      await transaction.depositTransaction(amount)
-      console.log('Deposit sent')
+      const signature = await transaction.depositTransaction(Number(amount))
+      const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+      Swal.fire({
+        icon: 'success',
+        title: 'Transaction success',
+        html: `Your transaction is successful. <br> 
+       <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+       View on Explorer
+       </a>`,
+        confirmButtonText: 'Confirm'
+      })
     } catch (error) {
-      console.error('Error sending transaction:', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Transaction error',
+        text: `${error}`,
+        confirmButtonText: 'Confirm'
+      })
     }
   }
 
@@ -51,44 +65,114 @@ export default function DeFiStakingPage() {
       primaryWallet as SolanaWallet
     )
     switch (withdrawToken) {
-      case 'BONK':
+      case 'Bonk':
         try {
-          await transaction.withdrawBonk(amount)
-          console.log('Deposit sent')
+          const signature = await transaction.withdrawBonk(Number(amount))
+          const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+           <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+           View on Explorer
+           </a>`,
+            confirmButtonText: 'Confirm'
+          })
         } catch (error) {
-          console.error('Error sending transaction:', error)
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
         }
         break
-      case 'MEMEDOGE':
+      case 'MemeDoge':
         try {
-          await transaction.withdrawMemeDoge(amount)
-          console.log('Deposit sent')
+          const signature = await transaction.withdrawMemeDoge(Number(amount))
+          const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+           <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+           View on Explorer
+           </a>`,
+            confirmButtonText: 'Confirm'
+          })
         } catch (error) {
-          console.error('Error sending transaction:', error)
-        }
-        break
-      case 'OPOS':
-        try {
-          await transaction.withdrawOPOS(amount)
-          console.log('Deposit sent')
-        } catch (error) {
-          console.error('Error sending transaction:', error)
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
         }
         break
       case 'OPOZ':
         try {
-          await transaction.withdrawOPOZ(amount)
-          console.log('Deposit sent')
+          const signature = await transaction.withdrawOPOZ(Number(amount))
+          const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+           <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+           View on Explorer
+           </a>`,
+            confirmButtonText: 'Confirm'
+          })
         } catch (error) {
-          console.error('Error sending transaction:', error)
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
         }
         break
-      case 'PEPE':
+      case 'OPOS':
         try {
-          await transaction.withdrawPepe(amount)
-          console.log('Deposit sent')
+          const signature = await transaction.withdrawOPOS(Number(amount))
+          const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+           <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+           View on Explorer
+           </a>`,
+            confirmButtonText: 'Confirm'
+          })
         } catch (error) {
-          console.error('Error sending transaction:', error)
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
+        }
+        break
+      case 'Pepe':
+        try {
+          const signature = await transaction.withdrawPepe(Number(amount))
+          const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+           <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+           View on Explorer
+           </a>`,
+            confirmButtonText: 'Confirm'
+          })
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
         }
         break
       default:
@@ -96,21 +180,21 @@ export default function DeFiStakingPage() {
     }
   }
   const tokens = [
-    { symbol: 'BONK' },
-    { symbol: 'MEMEDOGE' },
+    { symbol: 'Bonk' },
+    { symbol: 'MemeDoge' },
     { symbol: 'OPOS' },
     { symbol: 'OPOZ' },
-    { symbol: 'PEPE' }
+    { symbol: 'Pepe' }
   ]
 
   return (
-    <div className="w-full min-h-screen bg-gray-900 text-white p-6 md:p-8">
+    <div className="w-full min-h-screen text-white p-6 md:p-8">
       {/* Header */}
       <header className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-cyan-400">
+        <h1 className="text-3xl md:text-4xl font-bold">
           💎 Meme Liquidity Pool
         </h1>
-        <p className="text-gray-400 text-sm md:text-base mt-2">
+        <p className="text-sm md:text-base mt-2">
           Stake your BONKs and earn rewards effortlessly.
         </p>
       </header>
@@ -120,7 +204,7 @@ export default function DeFiStakingPage() {
         {tokens.map((token) => (
           <div
             key={token.symbol}
-            className="flex items-center justify-between p-4 bg-gray-800 rounded-lg shadow-md hover:bg-gray-700 transition-colors"
+            className="flex items-center justify-between p-4 bg-gradient-to-r from-custom-blue-start to-custom-blue-end rounded-lg shadow-md hover:bg-gray-700 transition-colors"
           >
             <div className="flex items-center gap-4">
               <span className="text-lg md:text-xl font-bold text-cyan-400">
@@ -162,24 +246,6 @@ export default function DeFiStakingPage() {
         </button>
         Staking Amount : 14.00
       </footer>
-
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 py-3">
-        <div className="flex justify-around items-center max-w-screen-xl mx-auto">
-          <Link href="/" className="flex flex-col items-center">
-            <span className="text-2xl text-cyan-400">🏠</span>
-            <span className="text-xs text-gray-400">Home</span>
-          </Link>
-          <Link href="/token-list" className="flex flex-col items-center">
-            <span className="text-2xl text-cyan-400">📊</span>
-            <span className="text-xs text-gray-400">Token List</span>
-          </Link>
-          <Link href="/defi" className="flex flex-col items-center">
-            <span className="text-2xl text-cyan-400">💎</span>
-            <span className="text-xs text-gray-400">DeFi</span>
-          </Link>
-        </div>
-      </div>
 
       {/* Modal */}
       {isOpen && (

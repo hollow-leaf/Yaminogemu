@@ -1,8 +1,4 @@
-'use client'
 import Link from 'next/link'
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { SolanaTransactionService } from '@/hooks/solanahook'
-import { SolanaWallet } from '@dynamic-labs/solana-core'
 
 const hall_data = [
   [
@@ -29,26 +25,6 @@ const hall_data = [
 ]
 
 export default function Hall() {
-  const { primaryWallet } = useDynamicContext()
-  const handleSend = async () => {
-    if (!primaryWallet) {
-      console.error('Wallet not available')
-      return
-    }
-
-    const transaction = new SolanaTransactionService(
-      primaryWallet as SolanaWallet
-    )
-    try {
-      await transaction.sendTransaction(
-        'ApWyxz5L6WRCGXxQ8uwThz8ppxvdFrQDQDp9sHF4qWGC',
-        0.01
-      )
-      console.log('Transaction sent')
-    } catch (error) {
-      console.error('Error sending transaction:', error)
-    }
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -90,35 +66,12 @@ export default function Hall() {
 
         {/* Button Section */}
         <div className="space-y-4 text-center mt-12">
-          <Link href="/get-start">
-            <button className="w-full bg-gradient-to-r from-orange-400 to-yellow-400 text-white font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90">
-              Play
-            </button>
-          </Link>
-          <button
-            onClick={handleSend}
-            className="w-full bg-white text-blue-500 font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90"
+          <Link
+            href="/get-start"
+            className="flex justify-center w-full bg-gradient-to-r from-orange-400 to-yellow-400 text-white font-bold py-3 md:py-4 lg:py-5 rounded-2xl shadow-md hover:opacity-90"
           >
-            Test Send 10 sol
-          </button>
-        </div>
-
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
-          <div className="flex justify-around items-center max-w-screen-xl mx-auto">
-            <Link href="/" className="flex flex-col items-center">
-              <span className="text-2xl">🏠</span>
-              <span className="text-xs text-gray-600">Home</span>
-            </Link>
-            <Link href="/token-list" className="flex flex-col items-center">
-              <span className="text-2xl">📊</span>
-              <span className="text-xs text-gray-600">Token list</span>
-            </Link>
-            {/* open windows and do something with dynamic wallet */}
-            <Link href="/defi" className="flex flex-col items-center">
-              <span className="text-2xl">💎</span>
-              <span className="text-xs text-gray-600">DeFi</span>
-            </Link>
-          </div>
+            Play
+          </Link>
         </div>
       </div>
     </div>
