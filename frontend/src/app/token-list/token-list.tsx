@@ -5,11 +5,11 @@ import Link from 'next/link'
 export default function TokenRankings() {
   // 模擬數據，可以替換為 API 獲取的數據
   const tokens = [
-    { rank: 1, symbol: 'Jake', balance: 12.5 },
-    { rank: 2, symbol: 'Solo', balance: 8.3 },
-    { rank: 3, symbol: 'Albert', balance: 20.1 },
-    { rank: 4, symbol: 'Sophia', balance: 5.8 },
-    { rank: 5, symbol: 'Kidney', balance: 15.7 }
+    { rank: 1, symbol: 'Jake', balance: 100 },
+    { rank: 2, symbol: 'Solo', balance: 99 },
+    { rank: 3, symbol: 'Albert', balance: 88 },
+    { rank: 4, symbol: 'Sophia', balance: 77 },
+    { rank: 5, symbol: 'Kidney', balance: 66 }
   ]
 
   return (
