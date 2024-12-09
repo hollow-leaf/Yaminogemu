@@ -31,12 +31,22 @@ app.get('/', async (c) => {
 
 app.post('/import_quiz', async (c) => {
   const reqData = await c.req.json()
-  const res0 = await c.env.yaminogemuDB
-  .prepare("INSERT INTO problem (q0, q1, q2, q3, q4, answer) VALUES (?, ?, ?, ?, ?, ?)")
-  .bind("A1", "B1", "C1", "D1", "E1", 1)
-  .run()
+  const quizs: { "Question": string, "C1": string, "C2": string, "C3": string, "C4": string, "Answer": string }[] = reqData['quizs']
 
-  return c.json({ "result": res0.success, "error": res0.error })
+  const prepares = quizs.map((q) => {
+    const answer: number = q["Answer"] == q["C1"] ? 0 : q["Answer"] == q["C2"] ? 1 : q["Answer"] == q["C3"] ? 2 : 3
+    return c.env.yaminogemuDB.prepare("INSERT INTO problem (q0, q1, q2, q3, q4, answer) VALUES (?, ?, ?, ?, ?, ?)").bind(q["C1"], q["C2"], q["C3"], q["C4"], q["Question"], answer)
+  })
+
+  const res0 = await c.env.yaminogemuDB.batch(prepares)
+
+  return c.json({ "result": res0[0].success, "error": res0[0].error })
+})
+
+app.get('/quizs', async (c) => {
+  const res0 = await c.env.yaminogemuDB.prepare("SELECT * FROM problem").all()
+
+  return c.json({ "result": res0.success, "error": res0.error, "quizs": res0.results })
 })
 
 app.post('/user', async (c) => {
@@ -148,9 +158,11 @@ app.post('/game/quiz', async (c) => {
   if(round >= 0 && round < 3) {
     const quiz = await c.env.yaminogemuDB.prepare('SELECT * FROM problem WHERE problems_id = ?').bind(game[rounds[round]]).all()
     return c.json({ "result": quiz.success, "error": quiz.error, "game_id": game_id, "quiz": quiz.results[0], "round": round })
+  } else if(round == 3) {
+    return c.json({ "result": res0.success, "error": res0.error, "game_id": game_id, "quiz": null, "round": -2 })
   } else {
     return c.json({ "result": res0.success, "error": res0.error, "game_id": game_id, "quiz": null, "round": -1 })
-  }
+  } 
 })
 
 //return next quiz and result

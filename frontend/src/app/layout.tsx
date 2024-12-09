@@ -4,15 +4,10 @@ import './globals.css'
 import DynamicConfig from '../config/dynamic.config'
 import ClientSideSelectBottom from './clientsideSelectBottom'
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
+const PoetsenOne = localFont({
+  src: './fonts/Poetsen_One/PoetsenOne-Regular.ttf',
   variable: '--font-geist-sans',
-  weight: '100 900'
-})
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900'
+  weight: '100 400'
 })
 
 export const metadata: Metadata = {
@@ -32,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-custom-gradient`}
+        className={`${PoetsenOne.variable} antialiased bg-custom-gradient`}
       >
         <DynamicConfig>
           {children}

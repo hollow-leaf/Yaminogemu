@@ -1,3 +1,6 @@
+import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx"
+
 export const stringify: typeof JSON.stringify = (value, replacer, space) =>
   JSON.stringify(
     value,
@@ -19,4 +22,12 @@ export function formatAddress(address: string) {
     const suffix = address.slice(-6) // Get the last six characters
     return `${prefix}...${suffix}` // Combine the first six, ..., and last six characters
   }
+}
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
