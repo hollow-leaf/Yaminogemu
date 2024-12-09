@@ -998,17 +998,14 @@ export class SolanaTransactionService {
     }
   }
 
-  public async Balance(tokenName: string): Promise<number> {
+  public async Balance(tokenName: string): Promise<string> {
     const connection = await this.getConnection()
     const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const ownerKey = new PublicKey(this.primaryWallet!.address)
     const ownership = PublicKey.findProgramAddressSync(
-      [Buffer.from('tbw_yaminogemu'),
-        ownerKey.toBuffer()
-      ],
+      [Buffer.from('tbw_yaminogemu')],
       tbwYaminogemuProgram.programId
     )[0]
       switch (tokenName) {
@@ -1021,9 +1018,9 @@ export class SolanaTransactionService {
             ASSOCIATED_TOKEN_PROGRAM_ID,
           )
           const info = await connection.getTokenAccountBalance(ownershipBonk)
-          if (info.value.uiAmount == null) throw new Error('No balance found')
-          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info.value.uiAmount)
-          return info.value.uiAmount
+          if (info.value.uiAmount == null) return '0'
+          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info.value.uiAmount)
+          return info.value.uiAmount.toString()
         case 'MemeDoge':
           const ownershipMemeDoge = getAssociatedTokenAddressSync(
             this.mintMemeDoge,
@@ -1033,9 +1030,9 @@ export class SolanaTransactionService {
           )
           const info2 =
             await connection.getTokenAccountBalance(ownershipMemeDoge)
-          if (info2.value.uiAmount == null) throw new Error('No balance found')
-          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info2.value.uiAmount)
-          return info2.value.uiAmount
+          if (info2.value.uiAmount == null) return '0'
+          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info2.value.uiAmount)
+          return info2.value.uiAmount.toString()
         case 'OPOZ':
           const ownershipOPOZ = getAssociatedTokenAddressSync(
             this.mintOPOZ,
@@ -1044,9 +1041,9 @@ export class SolanaTransactionService {
             this.tokenProgram
           )
           const info3 = await connection.getTokenAccountBalance(ownershipOPOZ)
-          if (info3.value.uiAmount == null) throw new Error('No balance found')
-          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info3.value.uiAmount)
-          return info3.value.uiAmount
+          if (info3.value.uiAmount == null) return '0'
+          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info3.value.uiAmount)
+          return info3.value.uiAmount.toString()
         case 'OPOS':
           const ownershipOPOS = getAssociatedTokenAddressSync(
             this.mintOPOS,
@@ -1055,9 +1052,9 @@ export class SolanaTransactionService {
             this.tokenProgram
           )
           const info4 = await connection.getTokenAccountBalance(ownershipOPOS)
-          if (info4.value.uiAmount == null) throw new Error('No balance found')
-          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info4.value.uiAmount)
-          return info4.value.uiAmount
+          if (info4.value.uiAmount == null) return '0'
+          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info4.value.uiAmount)
+          return info4.value.uiAmount.toString()
         case 'Pepe':
           const ownershipPepe = getAssociatedTokenAddressSync(
             this.mintPepe,
@@ -1066,11 +1063,11 @@ export class SolanaTransactionService {
             this.tokenProgram
           )
           const info5 = await connection.getTokenAccountBalance(ownershipPepe)
-          if (info5.value.uiAmount == null) throw new Error('No balance found')
-          console.log(`${tokenName} Balance (using Solana-Web3.js): `, info5.value.uiAmount)
-          return info5.value.uiAmount
+          if (info5.value.uiAmount == null) return '0'
+          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info5.value.uiAmount)
+          return info5.value.uiAmount.toString()
         default:
-          return 0
+          return '0'
       }
   }
 }

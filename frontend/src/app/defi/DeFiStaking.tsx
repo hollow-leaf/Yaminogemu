@@ -10,11 +10,11 @@ export default function DeFiStakingPage() {
   const [amount, setAmount] = useState(0)
   const [isOpen, setIsOpen] = useState(false)
   const [withdrawToken, setWithdrawToken] = useState('BONK')
-  const [bonkBalance, setBonkBalance] = useState<number>(0)
-  const [memeDogeBalance, setMemeDogeBalance] = useState<number>(0)
-  const [OPOZBalance, setOPOZBalance] = useState<number>(0)
-  const [OPOSBalance, setOPOSBalance] = useState<number>(0)
-  const [pepeBalance, setPepeBalance] = useState<number>(0)
+  const [bonkBalance, setBonkBalance] = useState<string>('0')
+  const [memeDogeBalance, setMemeDogeBalance] = useState<string>('0')
+  const [OPOZBalance, setOPOZBalance] = useState<string>('0')
+  const [OPOSBalance, setOPOSBalance] = useState<string>('0')
+  const [pepeBalance, setPepeBalance] = useState<string>('0')
   const toggleOpen = () => {
     setIsOpen(!isOpen)
   }
@@ -184,61 +184,54 @@ export default function DeFiStakingPage() {
     }
   }
 
-  const fetchTokenBalance = useCallback(async () => {
+  const fetchTokenBalance = async () => {
     if (!primaryWallet) {
-      console.error('Wallet not available')
-      return
+      console.error('Wallet not available');
+      return;
     }
-
+  
     const transaction = new SolanaTransactionService(
       primaryWallet as SolanaWallet
-    )
-
+    );
+  
+    const tokenNames = ['Bonk', 'MemeDoge', 'OPOZ', 'OPOS', 'Pepe'];
+    const balances: Record<string, string> = {};
     try {
-      const balance = await transaction.Balance('Bonk')
-      setBonkBalance(balance)
+      await Promise.all(
+        tokenNames.map(async (token) => {
+          try {
+            balances[token] = await transaction.Balance(token);
+          } catch (error) {
+            balances[token] = '0'; // Fallback balance
+          }
+        })
+      );
+  
+      // Batch state updates to avoid excessive re-renders
+      setBonkBalance(balances['Bonk'] || '0');
+      setMemeDogeBalance(balances['MemeDoge'] || '0');
+      setOPOZBalance(balances['OPOZ'] || '0');
+      setOPOSBalance(balances['OPOS'] || '0');
+      setPepeBalance(balances['Pepe'] || '0');
     } catch (error) {
-      console.error('Error occurred:', error)
+      console.error('Error fetching balances:', error);
     }
-    try {
-      const balance = await transaction.Balance('MemeDoge')
-      setMemeDogeBalance(balance)
-    } catch (error) {
-      console.error('Error occurred:', error)
-    }
-    try {
-      const balance = await transaction.Balance('OPOZ')
-      setOPOZBalance(balance)
-    } catch (error) {
-      console.error('Error occurred:', error)
-    }
-    try {
-      const balance = await transaction.Balance('OPOS')
-      setOPOSBalance(balance)
-    } catch (error) {
-      console.error('Error occurred:', error)
-    }
-    try {
-      const balance = await transaction.Balance('Pepe')
-      setPepeBalance(balance)
-    } catch (error) {
-      console.error('Error occurred:', error)
-    }
-  }, [primaryWallet])
+  };
+  
   useEffect(() => {
-    fetchTokenBalance()
-
+    fetchTokenBalance();
+  
     const intervalId = setInterval(() => {
-      fetchTokenBalance()
-    }, 20000) // 20 sec
-    return () => clearInterval(intervalId)
-  }, [fetchTokenBalance])
+      fetchTokenBalance();
+    }, 5000); // 5 sec
+    return () => clearInterval(intervalId);
+  }, []);
   const tokens = [
-    { symbol: 'Bonk', balance: `${bonkBalance}` },
-    { symbol: 'MemeDoge', balance: `${memeDogeBalance}` },
-    { symbol: 'OPOZ', balance: `${OPOZBalance}` },
-    { symbol: 'OPOS', balance: `${OPOSBalance}` },
-    { symbol: 'Pepe', balance: `${pepeBalance}` }
+    { symbol: 'Bonk', balance: `${bonkBalance}`, ratio: 1 },
+    { symbol: 'MemeDoge', balance: `${memeDogeBalance}`, ratio: 2 },
+    { symbol: 'OPOZ', balance: `${OPOZBalance}`, ratio: 2 },
+    { symbol: 'OPOS', balance: `${OPOSBalance}`, ratio: 2 },
+    { symbol: 'Pepe', balance: `${pepeBalance}`, ratio: 2 }
   ]
 
   return (
@@ -258,18 +251,18 @@ export default function DeFiStakingPage() {
         {tokens.map((token) => (
           <div
             key={token.symbol}
-            className="flex items-center justify-between p-4 bg-gradient-to-r from-custom-blue-start to-custom-blue-end rounded-lg shadow-md hover:bg-gray-700 transition-colors"
+            className="flex items-center justify-between p-4 rounded-lg shadow-md bg-gray-700 transition-colors"
           >
             <div className="flex items-center gap-4">
               <span className="text-lg md:text-xl font-bold text-cyan-400">
                 {token.symbol}
               </span>
               <span className="text-sm md:text-xl font-bold text-white">
-                ratio : 2
+                ratio : {token.ratio}
               </span>
             </div>
             <div className="text-right">
-              <span className="block text-cyan-400  text-sm md:text-base">
+              <span className="block text-white text-sm md:text-base">
                 Balance: {token.balance}
               </span>
               <button
