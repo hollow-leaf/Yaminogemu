@@ -18,16 +18,17 @@ import {
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync
 } from '@solana/spl-token'
+import { randomBytes } from 'crypto'
 
 export class SolanaTransactionService {
   private mintBonk = new PublicKey(
     'Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG'
   )
-  private mintBabyDoge = new PublicKey(
-    '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc'
+  private mintMemeDoge = new PublicKey(
+    'GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd'
   )
   private mintPepe = new PublicKey(
-    'GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd'
+    '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc'
   )
   private mintOPOZ = new PublicKey(
     '7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa'
@@ -35,8 +36,6 @@ export class SolanaTransactionService {
   private mintOPOS = new PublicKey(
     'C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id'
   )
-  private mintM = this.mintBabyDoge
-  private mintT = this.mintPepe
   private tokenProgram = TOKEN_2022_PROGRAM_ID
 
   constructor(private primaryWallet: SolanaWallet | null) {
@@ -57,7 +56,7 @@ export class SolanaTransactionService {
   public async sendTransaction(
     destinationAddress: string,
     amountSOL: number
-  ): Promise<void> {
+  ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -80,16 +79,14 @@ export class SolanaTransactionService {
 
     try {
       const { signature } = await signer.signAndSendTransaction(transaction)
-      console.log(
-        `Transaction successful: https://explorer.solana.com/tx/${signature}?cluster=devnet`
-      )
+      return signature
     } catch (error) {
-      console.error('Transaction failed:', error)
+      throw new Error(`Transaction failed: ${error}`)
     }
   }
 
   // Deposit BONK tokens
-  public async depositTransaction(amount: number): Promise<void> {
+  public async depositTransaction(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -143,16 +140,14 @@ export class SolanaTransactionService {
 
     try {
       const { signature } = await signer.signAndSendTransaction(transaction)
-      console.log(
-        `Transaction successful: https://explorer.solana.com/tx/${signature}?cluster=devnet`
-      )
+      return signature
     } catch (error) {
-      console.error('Transaction failed:', error)
+      throw error
     }
   }
 
   // Withdraw BONK tokens
-  public async withdrawBonk(amount: number): Promise<void> {
+  public async withdrawBonk(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -214,16 +209,14 @@ export class SolanaTransactionService {
 
     try {
       const { signature } = await signer.signAndSendTransaction(transaction)
-      console.log(
-        `Transaction successful: https://explorer.solana.com/tx/${signature}?cluster=devnet`
-      )
+      return signature
     } catch (error) {
-      console.error('Transaction failed:', error)
+      throw new Error(`Transaction failed: ${error}`)
     }
   }
 
   // Withdraw MEMEDOGE tokens
-  public async withdrawMemeDoge(amount: number): Promise<void> {
+  public async withdrawMemeDoge(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -237,8 +230,8 @@ export class SolanaTransactionService {
       [Buffer.from('tbw_yaminogemu')],
       tbwYaminogemuProgram.programId
     )[0]
-    const ownershipM = getAssociatedTokenAddressSync(
-      this.mintM,
+    const ownershipMemeDoge = getAssociatedTokenAddressSync(
+      this.mintMemeDoge,
       ownership,
       true,
       this.tokenProgram
@@ -247,7 +240,7 @@ export class SolanaTransactionService {
       [Buffer.from('vault'), ownerKey.toBuffer()],
       tbwYaminogemuProgram.programId
     )[0]
-    const [memeRatioM] = [this.mintM].map(
+    const [memeRatioMemeDoge] = [this.mintMemeDoge].map(
       (a) =>
         PublicKey.findProgramAddressSync(
           [Buffer.from('meme'), a.toBuffer()],
@@ -255,7 +248,7 @@ export class SolanaTransactionService {
         )[0]
     )
     const ownerAtaM = getAssociatedTokenAddressSync(
-      this.mintM,
+      this.mintMemeDoge,
       ownerKey,
       false,
       this.tokenProgram
@@ -267,10 +260,10 @@ export class SolanaTransactionService {
         provider: ownerKey,
         providervault: providerVault,
         ownership,
-        memeRatio: memeRatioM,
-        mintMeme: this.mintM,
+        memeRatio: memeRatioMemeDoge,
+        mintMeme: this.mintMemeDoge,
         providerAtaMeme: ownerAtaM,
-        ownershipMeme: ownershipM,
+        ownershipMeme: ownershipMemeDoge,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram: this.tokenProgram,
         systemProgram: SystemProgram.programId
@@ -285,16 +278,14 @@ export class SolanaTransactionService {
 
     try {
       const { signature } = await signer.signAndSendTransaction(transaction)
-      console.log(
-        `Transaction successful: https://explorer.solana.com/tx/${signature}?cluster=devnet`
-      )
+      return signature
     } catch (error) {
-      console.error('Transaction failed:', error)
+      throw new Error(`Transaction failed: ${error}`)
     }
   }
 
   // Withdraw OPOZ tokens
-  public async withdrawOPOZ(amount: number): Promise<void> {
+  public async withdrawOPOZ(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -356,16 +347,14 @@ export class SolanaTransactionService {
 
     try {
       const { signature } = await signer.signAndSendTransaction(transaction)
-      console.log(
-        `Transaction successful: https://explorer.solana.com/tx/${signature}?cluster=devnet`
-      )
+      return signature
     } catch (error) {
-      console.error('Transaction failed:', error)
+      throw new Error(`Transaction failed: ${error}`)
     }
   }
 
   // Withdraw OPOZ tokens
-  public async withdrawOPOS(amount: number): Promise<void> {
+  public async withdrawOPOS(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -427,16 +416,14 @@ export class SolanaTransactionService {
 
     try {
       const { signature } = await signer.signAndSendTransaction(transaction)
-      console.log(
-        `Transaction successful: https://explorer.solana.com/tx/${signature}?cluster=devnet`
-      )
+      return signature
     } catch (error) {
-      console.error('Transaction failed:', error)
+      throw new Error(`Transaction failed: ${error}`)
     }
   }
 
   // Withdraw OPOZ tokens
-  public async withdrawPepe(amount: number): Promise<void> {
+  public async withdrawPepe(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -460,7 +447,7 @@ export class SolanaTransactionService {
       [Buffer.from('vault'), ownerKey.toBuffer()],
       tbwYaminogemuProgram.programId
     )[0]
-    const [memeRatioT] = [this.mintT].map(
+    const [memeRatioPepe] = [this.mintPepe].map(
       (a) =>
         PublicKey.findProgramAddressSync(
           [Buffer.from('meme'), a.toBuffer()],
@@ -468,7 +455,7 @@ export class SolanaTransactionService {
         )[0]
     )
     const ownerAtaPepe = getAssociatedTokenAddressSync(
-      this.mintT,
+      this.mintPepe,
       ownerKey,
       false,
       this.tokenProgram
@@ -480,8 +467,8 @@ export class SolanaTransactionService {
         provider: ownerKey,
         providervault: providerVault,
         ownership,
-        memeRatio: memeRatioT,
-        mintMeme: this.mintT,
+        memeRatio: memeRatioPepe,
+        mintMeme: this.mintPepe,
         providerAtaMeme: ownerAtaPepe,
         ownershipMeme: ownershipPepe,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -498,11 +485,359 @@ export class SolanaTransactionService {
 
     try {
       const { signature } = await signer.signAndSendTransaction(transaction)
-      console.log(
-        `Transaction successful: https://explorer.solana.com/tx/${signature}?cluster=devnet`
-      )
+      return signature
     } catch (error) {
-      console.error('Transaction failed:', error)
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
+
+  // create function (user staking token then can play game.)
+  public async createBonk(amount: number): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const task_id = new BN(randomBytes(8))
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+
+    const [makerAtaBonk] = [ownerKey]
+      .map((a) =>
+        [this.mintBonk].map((m) =>
+          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
+        )
+      )
+      .flat()
+    const [memeRatioBonk] = [this.mintBonk].map(
+      (a) =>
+        PublicKey.findProgramAddressSync(
+          [Buffer.from('meme'), a.toBuffer()],
+          tbwYaminogemuProgram.programId
+        )[0]
+    )
+    const escrow = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('escrow'),
+        ownerKey.toBuffer(),
+        task_id.toArrayLike(Buffer, 'le', 8)
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const vaultBonk = getAssociatedTokenAddressSync(
+      this.mintBonk,
+      escrow,
+      true,
+      this.tokenProgram
+    )
+
+    const instructions = await tbwYaminogemuProgram.methods
+      .create(task_id, new BN(amount * 1e6))
+      .accountsStrict({
+        maker: ownerKey,
+        mintM: this.mintBonk,
+        makerAtaM: makerAtaBonk,
+        memeRatio: memeRatioBonk,
+        escrow,
+        vaultM: vaultBonk,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: this.tokenProgram,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
+
+  // create function (user staking token then can play game.)
+  public async createMemeDoge(amount: number): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const task_id = new BN(randomBytes(8))
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+
+    const [makerAtaMemeDoge] = [ownerKey]
+      .map((a) =>
+        [this.mintMemeDoge].map((m) =>
+          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
+        )
+      )
+      .flat()
+    const [memeRatioMemeDoge] = [this.mintMemeDoge].map(
+      (a) =>
+        PublicKey.findProgramAddressSync(
+          [Buffer.from('meme'), a.toBuffer()],
+          tbwYaminogemuProgram.programId
+        )[0]
+    )
+    const escrow = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('escrow'),
+        ownerKey.toBuffer(),
+        task_id.toArrayLike(Buffer, 'le', 8)
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const vaultMemeDoge = getAssociatedTokenAddressSync(
+      this.mintMemeDoge,
+      escrow,
+      true,
+      this.tokenProgram
+    )
+
+    const instructions = await tbwYaminogemuProgram.methods
+      .create(task_id, new BN(amount * 1e6))
+      .accountsStrict({
+        maker: ownerKey,
+        mintM: this.mintMemeDoge,
+        makerAtaM: makerAtaMemeDoge,
+        memeRatio: memeRatioMemeDoge,
+        escrow,
+        vaultM: vaultMemeDoge,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: this.tokenProgram,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
+
+  // create function (user staking token then can play game.)
+  public async createOPOZ(amount: number): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const task_id = new BN(randomBytes(8))
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+
+    const [makerAtaOPOZ] = [ownerKey]
+      .map((a) =>
+        [this.mintOPOZ].map((m) =>
+          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
+        )
+      )
+      .flat()
+    const [memeRatioOPOZ] = [this.mintOPOZ].map(
+      (a) =>
+        PublicKey.findProgramAddressSync(
+          [Buffer.from('meme'), a.toBuffer()],
+          tbwYaminogemuProgram.programId
+        )[0]
+    )
+    const escrow = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('escrow'),
+        ownerKey.toBuffer(),
+        task_id.toArrayLike(Buffer, 'le', 8)
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const vaultOPOZ = getAssociatedTokenAddressSync(
+      this.mintOPOZ,
+      escrow,
+      true,
+      this.tokenProgram
+    )
+
+    const instructions = await tbwYaminogemuProgram.methods
+      .create(task_id, new BN(amount * 1e6))
+      .accountsStrict({
+        maker: ownerKey,
+        mintM: this.mintOPOZ,
+        makerAtaM: makerAtaOPOZ,
+        memeRatio: memeRatioOPOZ,
+        escrow,
+        vaultM: vaultOPOZ,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: this.tokenProgram,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
+
+  // create function (user staking token then can play game.)
+  public async createOPOS(amount: number): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const task_id = new BN(randomBytes(8))
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+
+    const [makerAtaOPOS] = [ownerKey]
+      .map((a) =>
+        [this.mintOPOS].map((m) =>
+          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
+        )
+      )
+      .flat()
+    const [memeRatioOPOS] = [this.mintOPOS].map(
+      (a) =>
+        PublicKey.findProgramAddressSync(
+          [Buffer.from('meme'), a.toBuffer()],
+          tbwYaminogemuProgram.programId
+        )[0]
+    )
+    const escrow = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('escrow'),
+        ownerKey.toBuffer(),
+        task_id.toArrayLike(Buffer, 'le', 8)
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const vaultOPOS = getAssociatedTokenAddressSync(
+      this.mintOPOS,
+      escrow,
+      true,
+      this.tokenProgram
+    )
+
+    const instructions = await tbwYaminogemuProgram.methods
+      .create(task_id, new BN(amount * 1e6))
+      .accountsStrict({
+        maker: ownerKey,
+        mintM: this.mintOPOS,
+        makerAtaM: makerAtaOPOS,
+        memeRatio: memeRatioOPOS,
+        escrow,
+        vaultM: vaultOPOS,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: this.tokenProgram,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
+
+  // create function (user staking token then can play game.)
+  public async createPepe(amount: number): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
+      TbwYaminogemuJson as TbwYaminogemu,
+      { connection }
+    )
+    const task_id = new BN(randomBytes(8))
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+
+    const [makerAtaPepe] = [ownerKey]
+      .map((a) =>
+        [this.mintPepe].map((m) =>
+          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
+        )
+      )
+      .flat()
+    const [memeRatioPepe] = [this.mintPepe].map(
+      (a) =>
+        PublicKey.findProgramAddressSync(
+          [Buffer.from('meme'), a.toBuffer()],
+          tbwYaminogemuProgram.programId
+        )[0]
+    )
+    const escrow = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('escrow'),
+        ownerKey.toBuffer(),
+        task_id.toArrayLike(Buffer, 'le', 8)
+      ],
+      tbwYaminogemuProgram.programId
+    )[0]
+    const vaultPepe = getAssociatedTokenAddressSync(
+      this.mintPepe,
+      escrow,
+      true,
+      this.tokenProgram
+    )
+
+    const instructions = await tbwYaminogemuProgram.methods
+      .create(task_id, new BN(amount * 1e6))
+      .accountsStrict({
+        maker: ownerKey,
+        mintM: this.mintPepe,
+        makerAtaM: makerAtaPepe,
+        memeRatio: memeRatioPepe,
+        escrow,
+        vaultM: vaultPepe,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram: this.tokenProgram,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
     }
   }
 }

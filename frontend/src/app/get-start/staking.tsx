@@ -1,17 +1,26 @@
 'use client'
 import { formatAddress } from '@/utils/strignfy'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useUserWallets } from '@dynamic-labs/sdk-react-core'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { X } from 'lucide-react'
+import { SolanaWallet } from '@dynamic-labs/solana-core'
+import { SolanaTransactionService } from '@/hooks/solanahook'
+import Swal from 'sweetalert2'
 
 export default function Staking() {
   const userWallets = useUserWallets()
   const { primaryWallet } = useDynamicContext()
   const [balance, setBalance] = useState<string | undefined | null>(null)
   const [chain, setChain] = useState<string | undefined | null>(null)
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [amount, setAmount] = useState<string>('')
+  const [selectedOption, setSelectedOption] = useState<string>('Bonk')
 
+  const toggleOpen = () => {
+    setIsOpen(!isOpen)
+  }
   useEffect(() => {
     setChain(userWallets[0]?.chain)
   }, [userWallets])
@@ -27,10 +36,127 @@ export default function Staking() {
   }, [primaryWallet])
 
   const router = useRouter()
-  const handleStaking = () => {
-    console.log('clicked!')
-    if (true) {
-      router.push('/get-start/match')
+  const handleStaking = async () => {
+    if (!primaryWallet) {
+      console.error('Wallet not available')
+      return
+    }
+
+    const transaction = new SolanaTransactionService(
+      primaryWallet as SolanaWallet
+    )
+    switch (selectedOption) {
+      case 'Bonk':
+        try {
+          const signature = await transaction.createBonk(Number(amount))
+          const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+           <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+           View on Explorer
+           </a>`,
+            confirmButtonText: 'Confirm'
+          })
+          router.push('/get-start/match')
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
+        }
+        break
+      case 'MemeDoge':
+        try {
+          const explorerTx = await transaction.createMemeDoge(Number(amount))
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+           <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+           View on Explorer
+           </a>`,
+            confirmButtonText: 'Confirm'
+          })
+          router.push('/get-start/match')
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
+        }
+        break
+      case 'OPOZ':
+        try {
+          const explorerTx = await transaction.createOPOZ(Number(amount))
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+             <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+             View on Explorer
+             </a>`,
+            confirmButtonText: 'Confirm'
+          })
+          router.push('/get-start/match')
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
+        }
+        break
+      case 'OPOS':
+        try {
+          const explorerTx = await transaction.createOPOS(Number(amount))
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+               <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+               View on Explorer
+               </a>`,
+            confirmButtonText: 'Confirm'
+          })
+          router.push('/get-start/match')
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
+        }
+        break
+      case 'Pepe':
+        try {
+          const explorerTx = await transaction.createPepe(Number(amount))
+          Swal.fire({
+            icon: 'success',
+            title: 'Transaction success',
+            html: `Your transaction is successful. <br> 
+                 <a href="${explorerTx}" target="_blank" style="color: #3085d6; text-decoration: underline;">
+                 View on Explorer
+                 </a>`,
+            confirmButtonText: 'Confirm'
+          })
+          router.push('/get-start/match')
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Transaction error',
+            text: `${error}`,
+            confirmButtonText: 'Confirm'
+          })
+        }
+        break
     }
   }
 
@@ -74,62 +200,76 @@ export default function Staking() {
           </div>
         </div>
       </div>
-
-      <div className="mb-6 md:mb-8">
-        <div className="flex justify-between text-sm md:text-sm lg:text-base mb-2">
-          <span>Level 2</span>
-          <span>40%</span>
-        </div>
-        <div className="w-full bg-gray-100 rounded-full h-2">
-          <div className="bg-cyan-400 h-2 rounded-full w-[40%]"></div>
-        </div>
-      </div>
-
-      <p className="text-gray-600 text-sm md:text-base lg:text-lg mb-3 md:mb-4">
-        Yaminogemu #tokens
-      </p>
-      <div className="grid grid-cols-3 gap-3 md:gap-4 lg:gap-6 mb-6 md:mb-8">
-        <div className="hex bg-blue-100 aspect-square flex items-center justify-center transform hover:scale-105 transition-transform">
-          <span className="text-2xl md:text-3xl lg:text-4xl"></span>
-        </div>
-        <div className="hex bg-blue-100 aspect-square flex items-center justify-center transform hover:scale-105 transition-transform">
-          <span className="text-2xl md:text-3xl lg:text-4xl">⭐</span>
-        </div>
-        <div className="hex bg-blue-100 aspect-square flex items-center justify-center transform hover:scale-105 transition-transform">
-          <span className="text-2xl md:text-3xl lg:text-4xl">⚡</span>
-        </div>
-        <div className="hex bg-blue-100 aspect-square flex items-center justify-center transform hover:scale-105 transition-transform">
-          <span className="text-2xl md:text-3xl lg:text-4xl">🏆</span>
-        </div>
-        <div className="hex bg-blue-100 aspect-square flex items-center justify-center transform hover:scale-105 transition-transform">
-          <span className="text-2xl md:text-3xl lg:text-4xl">👑</span>
+      <div className="flex items-center mb-6 md:mb-4">
+        <div className="space-y-6">
+          <p className="font-bold text-2xl md:text-4xl">How to play?</p>
+          <ul className="space-y-2 text-pretty">
+            <li>1. Click Start !</li>
+            <li>2. Select your token, that you would like to stake.</li>
+            <li>3. Enjoy your game.</li>
+          </ul>
         </div>
       </div>
-
+      <div className="flex my-48" />
       <button
-        onClick={handleStaking}
+        onClick={toggleOpen}
         className="w-full bg-cyan-400 text-white py-3 md:py-4 rounded-full font-medium text-sm md:text-base lg:text-lg hover:bg-cyan-500 transition-colors"
       >
         Start
       </button>
+      {/* Modal */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          onClick={toggleOpen}
+        >
+          <section
+            className="bg-white text-black border-4 border-cyan-400 p-3 rounded-xl shadow-lg w-2/3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-end">
+              <X
+                onClick={toggleOpen}
+                className="hover:rotate-90 duration-300"
+              />
+            </div>
+            <h2 className="text-lg font-bold">Let&rsquo;s start</h2>
+            <p className="mt-2">
+              Select staking token & Enter the amount you wish to stake.
+            </p>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2">
-        <div className="flex justify-around items-center max-w-screen-xl mx-auto">
-          <Link href="/" className="flex flex-col items-center">
-            <span className="text-2xl">🏠</span>
-            <span className="text-xs text-gray-600">Home</span>
-          </Link>
-          <Link href="/token-list" className="flex flex-col items-center">
-            <span className="text-2xl">📊</span>
-            <span className="text-xs text-gray-600">Token list</span>
-          </Link>
-          {/* open windows and do something with dynamic wallet */}
-          <Link href="/defi" className="flex flex-col items-center">
-            <span className="text-2xl">💎</span>
-            <span className="text-xs text-gray-600">DeFi</span>
-          </Link>
+            {/* Select box with 5 options */}
+            <select
+              value={selectedOption}
+              onChange={(e) => setSelectedOption(e.currentTarget.value)}
+              className="mt-4 w-full py-2 px-3 border rounded-md"
+            >
+              <option value="Bonk">Bonk</option>
+              <option value="MemeDoge">MemeDoge</option>
+              <option value="OPOZ">OPOZ</option>
+              <option value="OPOS">OPOS</option>
+              <option value="Pepe">Pepe</option>
+            </select>
+
+            <input
+              type="number"
+              min={0}
+              onChange={(e) => setAmount(e.target.value)}
+              className="mt-4 w-full py-2 px-3 border rounded-md"
+              placeholder="Amount"
+            />
+
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleStaking}
+                className="bg-cyan-500 text-white py-2 px-4 rounded-md hover:bg-cyan-600"
+              >
+                Confirm
+              </button>
+            </div>
+          </section>
         </div>
-      </div>
+      )}
     </div>
   )
 }

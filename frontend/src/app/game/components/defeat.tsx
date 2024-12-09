@@ -10,7 +10,7 @@ export default function Defeat() {
           Defeat!
         </h2>
         <p className="text-xl md:text-2xl font-light opacity-80">
-          The battle is lost. Don’t give up!
+          The battle is lost. Do not give up!
         </p>
       </div>
 
