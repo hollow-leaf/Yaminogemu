@@ -1008,66 +1008,65 @@ export class SolanaTransactionService {
       [Buffer.from('tbw_yaminogemu')],
       tbwYaminogemuProgram.programId
     )[0]
-      switch (tokenName) {
-        case 'Bonk':
-          const ownershipBonk = getAssociatedTokenAddressSync(
-            this.mintBonk,
-            ownership,
-            true,
-            this.tokenProgram,
-            ASSOCIATED_TOKEN_PROGRAM_ID,
-          )
-          const info = await connection.getTokenAccountBalance(ownershipBonk)
-          if (info.value.uiAmount == null) return '0'
-          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info.value.uiAmount)
-          return info.value.uiAmount.toString()
-        case 'MemeDoge':
-          const ownershipMemeDoge = getAssociatedTokenAddressSync(
-            this.mintMemeDoge,
-            ownership,
-            true,
-            this.tokenProgram
-          )
-          const info2 =
-            await connection.getTokenAccountBalance(ownershipMemeDoge)
-          if (info2.value.uiAmount == null) return '0'
-          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info2.value.uiAmount)
-          return info2.value.uiAmount.toString()
-        case 'OPOZ':
-          const ownershipOPOZ = getAssociatedTokenAddressSync(
-            this.mintOPOZ,
-            ownership,
-            true,
-            this.tokenProgram
-          )
-          const info3 = await connection.getTokenAccountBalance(ownershipOPOZ)
-          if (info3.value.uiAmount == null) return '0'
-          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info3.value.uiAmount)
-          return info3.value.uiAmount.toString()
-        case 'OPOS':
-          const ownershipOPOS = getAssociatedTokenAddressSync(
-            this.mintOPOS,
-            ownership,
-            true,
-            this.tokenProgram
-          )
-          const info4 = await connection.getTokenAccountBalance(ownershipOPOS)
-          if (info4.value.uiAmount == null) return '0'
-          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info4.value.uiAmount)
-          return info4.value.uiAmount.toString()
-        case 'Pepe':
-          const ownershipPepe = getAssociatedTokenAddressSync(
-            this.mintPepe,
-            ownership,
-            true,
-            this.tokenProgram
-          )
-          const info5 = await connection.getTokenAccountBalance(ownershipPepe)
-          if (info5.value.uiAmount == null) return '0'
-          // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info5.value.uiAmount)
-          return info5.value.uiAmount.toString()
-        default:
-          return '0'
-      }
+    switch (tokenName) {
+      case 'Bonk':
+        const ownershipBonk = getAssociatedTokenAddressSync(
+          this.mintBonk,
+          ownership,
+          true,
+          this.tokenProgram,
+          ASSOCIATED_TOKEN_PROGRAM_ID
+        )
+        const info = await connection.getTokenAccountBalance(ownershipBonk)
+        if (info.value.uiAmount == null) return '0'
+        // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info.value.uiAmount)
+        return info.value.uiAmount.toString()
+      case 'MemeDoge':
+        const ownershipMemeDoge = getAssociatedTokenAddressSync(
+          this.mintMemeDoge,
+          ownership,
+          true,
+          this.tokenProgram
+        )
+        const info2 = await connection.getTokenAccountBalance(ownershipMemeDoge)
+        if (info2.value.uiAmount == null) return '0'
+        // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info2.value.uiAmount)
+        return info2.value.uiAmount.toString()
+      case 'OPOZ':
+        const ownershipOPOZ = getAssociatedTokenAddressSync(
+          this.mintOPOZ,
+          ownership,
+          true,
+          this.tokenProgram
+        )
+        const info3 = await connection.getTokenAccountBalance(ownershipOPOZ)
+        if (info3.value.uiAmount == null) return '0'
+        // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info3.value.uiAmount)
+        return info3.value.uiAmount.toString()
+      case 'OPOS':
+        const ownershipOPOS = getAssociatedTokenAddressSync(
+          this.mintOPOS,
+          ownership,
+          true,
+          this.tokenProgram
+        )
+        const info4 = await connection.getTokenAccountBalance(ownershipOPOS)
+        if (info4.value.uiAmount == null) return '0'
+        // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info4.value.uiAmount)
+        return info4.value.uiAmount.toString()
+      case 'Pepe':
+        const ownershipPepe = getAssociatedTokenAddressSync(
+          this.mintPepe,
+          ownership,
+          true,
+          this.tokenProgram
+        )
+        const info5 = await connection.getTokenAccountBalance(ownershipPepe)
+        if (info5.value.uiAmount == null) return '0'
+        // console.log(`${tokenName} Balance (using Solana-Web3.js): `, info5.value.uiAmount)
+        return info5.value.uiAmount.toString()
+      default:
+        return '0'
+    }
   }
 }

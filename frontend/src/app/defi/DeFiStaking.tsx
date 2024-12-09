@@ -1,5 +1,5 @@
 'use client'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
 import { SolanaTransactionService } from '@/hooks/solanahook'
 import { SolanaWallet } from '@dynamic-labs/solana-core'
@@ -186,46 +186,46 @@ export default function DeFiStakingPage() {
 
   const fetchTokenBalance = async () => {
     if (!primaryWallet) {
-      console.error('Wallet not available');
-      return;
+      console.error('Wallet not available')
+      return
     }
-  
+
     const transaction = new SolanaTransactionService(
       primaryWallet as SolanaWallet
-    );
-  
-    const tokenNames = ['Bonk', 'MemeDoge', 'OPOZ', 'OPOS', 'Pepe'];
-    const balances: Record<string, string> = {};
+    )
+
+    const tokenNames = ['Bonk', 'MemeDoge', 'OPOZ', 'OPOS', 'Pepe']
+    const balances: Record<string, string> = {}
     try {
       await Promise.all(
         tokenNames.map(async (token) => {
           try {
-            balances[token] = await transaction.Balance(token);
-          } catch (error) {
-            balances[token] = '0'; // Fallback balance
+            balances[token] = await transaction.Balance(token)
+          } catch (e) {
+            balances[token] = '0'
           }
         })
-      );
-  
+      )
+
       // Batch state updates to avoid excessive re-renders
-      setBonkBalance(balances['Bonk'] || '0');
-      setMemeDogeBalance(balances['MemeDoge'] || '0');
-      setOPOZBalance(balances['OPOZ'] || '0');
-      setOPOSBalance(balances['OPOS'] || '0');
-      setPepeBalance(balances['Pepe'] || '0');
+      setBonkBalance(balances['Bonk'] || '0')
+      setMemeDogeBalance(balances['MemeDoge'] || '0')
+      setOPOZBalance(balances['OPOZ'] || '0')
+      setOPOSBalance(balances['OPOS'] || '0')
+      setPepeBalance(balances['Pepe'] || '0')
     } catch (error) {
-      console.error('Error fetching balances:', error);
+      console.error('Error fetching balances:', error)
     }
-  };
-  
+  }
+
   useEffect(() => {
-    fetchTokenBalance();
-  
+    fetchTokenBalance()
+
     const intervalId = setInterval(() => {
-      fetchTokenBalance();
-    }, 5000); // 5 sec
-    return () => clearInterval(intervalId);
-  }, []);
+      fetchTokenBalance()
+    }, 5000) // 5 sec
+    return () => clearInterval(intervalId)
+  }, [fetchTokenBalance])
   const tokens = [
     { symbol: 'Bonk', balance: `${bonkBalance}`, ratio: 1 },
     { symbol: 'MemeDoge', balance: `${memeDogeBalance}`, ratio: 2 },
