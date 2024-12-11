@@ -65,10 +65,7 @@ function Gaming() {
   }
   return (
     <div
-      className="bg-white flex flex-col min-h-screen items-center p-4"
-      style={{
-        backgroundImage: 'linear-gradient(120deg, #EC692C 0%, #F4CF28 100%)'
-      }}
+      className="flex flex-col min-h-screen items-center p-4"
     >
       <div
         className={cn(
@@ -89,14 +86,14 @@ function Gaming() {
       </div>
       {!isWaiting && (
         <div>
-          <div className="rounded-xl bg-white/30 w-full min-h-[300px] p-4 mb-[24px] mt-[180px] drop-shadow-xl">
-            <div className="text-[48px] mb-[12px]">How to play?</div>
-            <div className="text-[36px] mb-[12px]">Step1:</div>
-            <div className="text-[32px] mb-[12px]">Pay memecoin</div>
-            <div className="text-[36px] mb-[12px]">Step2:</div>
-            <div className="text-[32px] mb-[12px]">Waiting for matching</div>
-            <div className="text-[36px] mb-[12px]">Step3:</div>
-            <div className="text-[32px] mb-[12px]">Win and earn Bonk!</div>
+          <div className="rounded-xl bg-white/30 w-full min-h-[300px] py-4 px-8 mb-[24px] mt-[180px] drop-shadow-xl">
+            <div className="text-[36px] mb-[12px]">How to play?</div>
+            <div className="text-[32px] mb-[12px]">Step1:</div>
+            <div className="text-[28px] mb-[12px]">Pay memecoin</div>
+            <div className="text-[32px] mb-[12px]">Step2:</div>
+            <div className="text-[28px] mb-[12px]">Waiting for matching</div>
+            <div className="text-[32px] mb-[12px]">Step3:</div>
+            <div className="text-[28px] mb-[12px]">Win and earn <span className='text-[#F4CF20]'>Bonk</span>!</div>
           </div>
           <div className="w-full flex items-end">
             <button
