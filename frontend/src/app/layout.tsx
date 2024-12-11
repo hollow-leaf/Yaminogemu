@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import { SolanaWalletProvider } from './SolanaWalletProvider'
+import SelectBottom from '@/components/SelectBottom'
 
 
 const PoetsenOne = localFont({
@@ -36,6 +37,7 @@ export default function RootLayout({
       >
         <SolanaWalletProvider>
           {children}
+          <SelectBottom />
         </SolanaWalletProvider>
       </body>
     </html>

@@ -101,7 +101,12 @@ function Gaming() {
   }, [round])
 
   return (
-    <div className="flex justify-center min-h-screen items-center p-4">
+    <div 
+      className="absolute top-0 w-full z-20 flex justify-center min-h-screen items-center p-4"
+      style={{
+        backgroundImage: "linear-gradient(-225deg, #80DEEA 0%, #57E9F2 48%, #45D4FB 100%)"
+      }}  
+    >
       {round < 0 && (
         <div className='w-full flex flex-col items-center'>
            <div className="text-[36px] mb-[12px]">Match found</div>

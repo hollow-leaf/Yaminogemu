@@ -31,7 +31,12 @@ export default function Hall() {
   }, [isLoggedIn])
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div 
+      className="absolute top-0 z-20 w-full flex items-center justify-center min-h-screen"
+      style={{
+        backgroundImage: "linear-gradient(-225deg, #80DEEA 0%, #57E9F2 48%, #45D4FB 100%)"
+      }}  
+    >
       <div className="w-full max-w-[400px] md:max-w-[600px] lg:max-w-[800px] rounded-xl p-4">
         {/* Title Section */}
         <div className="text-center mb-6">
@@ -55,7 +60,7 @@ export default function Hall() {
             className="rounded-xl w-full text-2xl shadow px-4 py-2 bg-[#2C2D32] text-white"
             onClick={playHandler}
           >
-            Play
+            Enter
           </button>
         </div>
       </div>
