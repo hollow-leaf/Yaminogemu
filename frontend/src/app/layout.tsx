@@ -1,17 +1,7 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
-import DynamicConfig from '../config/dynamic.config'
-import ClientSideSelectBottom from './clientsideSelectBottom'
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { UnsafeBurnerWalletAdapter } from '@solana/wallet-adapter-wallets';
-import {
-    WalletModalProvider,
-    WalletDisconnectButton,
-    WalletMultiButton
-} from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
+import { SolanaWalletProvider } from './SolanaWalletProvider'
 
 
 const PoetsenOne = localFont({
@@ -34,6 +24,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+
   return (
     <html lang="en">
       <body 
@@ -43,8 +34,9 @@ export default function RootLayout({
 /*           backgroundImage: 'linear-gradient(120deg, #EC692C 0%, #F4CF28 100%)'
  */        }}  
       >
+        <SolanaWalletProvider>
           {children}
-          <ClientSideSelectBottom />
+        </SolanaWalletProvider>
       </body>
     </html>
   )

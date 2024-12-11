@@ -1,8 +1,11 @@
 import { ModalXs } from "./ModalXS";
+import { SolanaConnect } from "./WalletMultiButton";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export function LoginModal(props: {showBox: any, closed: any, isLoading: any}) {
 
-    const isLoggedIn = false
+    const wallet = useWallet()
+    const isLoggedIn = wallet.connected
 
     return (
         <div>
@@ -14,9 +17,7 @@ export function LoginModal(props: {showBox: any, closed: any, isLoading: any}) {
                 <div
                     className="flex items-center justify-center w-[300px] h-[100px]"
                 >
-                    <div>
-
-                    </div>
+                    <SolanaConnect />
                 </div>
             </ModalXs>
         </div>

@@ -3,13 +3,15 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { LoginModal } from './loginModal'
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function Hall() {
 
   const [isPlay, setIsPlay] = useState<boolean>(false)
   const [showBox, setShowBox] = useState<boolean>(false)
 
-  const isLoggedIn = false
+  const wallet = useWallet()
+  const isLoggedIn = wallet.connected
   const router = useRouter()
 
   function playHandler() {
