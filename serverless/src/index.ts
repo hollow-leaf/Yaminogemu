@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { getUniqueRandomInts } from './utils'
 
 type Bindings = {
   yaminogemuKVM: KVNamespace
@@ -85,10 +86,10 @@ app.post('/match', async (c) => {
     return c.json({ "result": res0.success, "error": res0.error, "match_id": res0.meta.last_row_id })
   } else {
     const match = waitingList[0].results[0] as any
-
+    const quizs = getUniqueRandomInts(3, 0, 199)
     const new_game = await c.env.yaminogemuDB
     .prepare('INSERT INTO game (problem0_id, problem1_id, problem2_id, start_time, round, user1_score, user2_score) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(1, 2, 3, new Date().toISOString(), -1, 0, 0)
+    .bind(quizs[0], quizs[1], quizs[2], new Date().toISOString(), -1, 0, 0)
     .run()
     const game_id = new_game.meta.last_row_id
 

@@ -57,6 +57,7 @@ function Gaming() {
     while (true) {
       const res1 = await gameQuiz(Number(game_id))
       if (res1.round === -2) {
+        await scoreUpdate()
         setIsEnd(true)
         return
       }
