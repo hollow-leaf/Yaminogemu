@@ -1,13 +1,13 @@
 'use client'
-import { DynamicWidget, useIsLoggedIn } from '@dynamic-labs/sdk-react-core'
 import TokenRankings from './token-list'
+import { useWallet } from '@solana/wallet-adapter-react'
 
 export default function Home() {
-  const isLoggedIn = useIsLoggedIn()
-
+  const wallet = useWallet()
+  const isLoggedIn = wallet.connected
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      {isLoggedIn ? <TokenRankings /> : <DynamicWidget />}
+      {isLoggedIn && <TokenRankings />}
     </div>
   )
 }
