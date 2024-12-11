@@ -1,3 +1,4 @@
+import { Quiz } from '@/app/type';
 import { serverlessHost } from './config'
 
 export async function gamePrepare(
@@ -37,7 +38,7 @@ export async function gameQuiz(
   error: unknown
   game_id: number
   round: number
-  quiz: unknown
+  quiz: Quiz | null
 }> {
   const requestOptions = {
     method: 'POST',
@@ -60,7 +61,7 @@ export async function gameQuiz(
       error: 'Something wrong',
       game_id: game_id,
       round: -1,
-      quiz: undefined
+      quiz: null
     }
   }
 }

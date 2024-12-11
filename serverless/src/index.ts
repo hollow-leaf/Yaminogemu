@@ -191,7 +191,7 @@ app.post('/game/answer', async (c) => {
     }
     const update_game = await c.env.yaminogemuDB
     .prepare('UPDATE game SET user1_state = ?, user1_score = ?, round = ?')
-    .bind(round + 1, isCorrect ? game['user1_state'] + 10 : game['user1_state'], game['user2_state'])
+    .bind(round + 1, isCorrect ? game['user1_score'] + 10 : game['user1_score'], game['user2_state'])
     .run()
     return c.json({ "result": update_game.success, "error": update_game.error, "game_id": game_id, "score": isCorrect ? game['user1_state'] + 10 : game['user1_state'], isCorrect: isCorrect })
   } else {
@@ -200,7 +200,7 @@ app.post('/game/answer', async (c) => {
     }
     const update_game = await c.env.yaminogemuDB
     .prepare('UPDATE game SET user2_state = ?, user2_score = ?, round = ?')
-    .bind(round + 1, isCorrect ? game['user2_state'] + 10 : game['user2_state'], game['user1_state'])
+    .bind(round + 1, isCorrect ? game['user2_score'] + 10 : game['user2_score'], game['user1_state'])
     .run()
     return c.json({ "result": update_game.success, "error": update_game.error, "game_id": game_id, "score": isCorrect ? game['user2_state'] + 10 : game['user2_state'], isCorrect: isCorrect })
   }

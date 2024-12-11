@@ -5,17 +5,27 @@ import { cn, sleep } from '@/utils/strignfy'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import { useWallet } from '@solana/wallet-adapter-react'
 
 function Gaming() {
   const router = useRouter()
 
-  const [userAddr, setUserAddr] = useState<string | null>(
-    '0x6F744A5737507F035c42872f6869203829F78E36'
-  )
+  const wallet = useWallet()
+  const isLoggedIn = wallet.connected
+
+  const [userAddr, setUserAddr] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState<boolean>(false)
   const [matchId, setMatchId] = useState<number>(-1)
   const [tokenType, setTokenType] = useState<string | null>('BONK')
   const [gameId, setGameId] = useState<number>(-1)
+
+  useEffect(() => {
+    if(!isLoggedIn || wallet.publicKey == null) {
+      router.replace('/')
+    } else {
+      setUserAddr(wallet.publicKey.toString())
+    }
+  }, [])
 
   useEffect(() => {
     if (gameId == -1) return
