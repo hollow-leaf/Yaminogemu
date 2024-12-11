@@ -1,5 +1,4 @@
 'use client'
-import { DynamicWidget } from '@dynamic-labs/sdk-react-core'
 import { useEffect, useState } from 'react'
 import Hall from '@/components/hall'
 
