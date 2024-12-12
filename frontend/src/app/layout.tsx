@@ -1,8 +1,14 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
-import { SolanaWalletProvider } from './SolanaWalletProvider'
 import SelectBottom from '@/components/SelectBottom'
+import { SolanaWalletConnectors } from "@dynamic-labs/solana";
+import {
+  DynamicContextProvider,
+  DynamicWidget,
+  SortWallets,
+} from "@dynamic-labs/sdk-react-core";
+import DynamicConfig from '@/config/dynamic.config';
 
 
 const PoetsenOne = localFont({
@@ -35,10 +41,10 @@ export default function RootLayout({
 /*           backgroundImage: 'linear-gradient(120deg, #EC692C 0%, #F4CF28 100%)'
  */        }}  
       >
-        <SolanaWalletProvider>
+        <DynamicConfig>
           {children}
           <SelectBottom />
-        </SolanaWalletProvider>
+        </DynamicConfig>
       </body>
     </html>
   )

@@ -4,16 +4,21 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { gameAnswer, gamePrepare, gameQuiz, gameResult } from '@/services/api/game'
 import { cn, sleep } from '@/utils/strignfy'
 import Image from 'next/image'
-import { useWallet } from '@solana/wallet-adapter-react'
 import { Quiz } from '../type'
+import {
+  useIsLoggedIn,
+  useDynamicContext
+} from "@dynamic-labs/sdk-react-core";
+import { isSolanaWallet } from '@dynamic-labs/solana';
+import { PublicKey } from '@solana/web3.js'
 
 function Gaming() {
   const router = useRouter()
   const params = useSearchParams()
   const game_id = params.get('game_id')
 
-  const wallet = useWallet()
-  const isLoggedIn = wallet.connected
+  const isLoggedIn = useIsLoggedIn()
+  const { primaryWallet } = useDynamicContext();
 
   const [userAddr, setUserAddr] = useState<string | null>(null)
   const [quiz, setQuiz] = useState<Quiz | null>(null)
@@ -25,10 +30,18 @@ function Gaming() {
   const [scores, setScores] = useState<{s0: number, s1: number}>({s0: 0, s1: 0})
 
   useEffect(() => {
-    if(!isLoggedIn || wallet.publicKey == null) {
-      router.replace('/')
+    if(isLoggedIn) {
+      if(primaryWallet != null) {
+        if(!isSolanaWallet(primaryWallet)) {
+          router.replace('/')
+        }
+        const fromKey = new PublicKey(primaryWallet.address); 
+        setUserAddr(fromKey.toBase58())
+      } else {
+        router.replace('/')
+      }
     } else {
-      setUserAddr(wallet.publicKey.toString())
+      router.replace('/')
     }
   }, [])
 

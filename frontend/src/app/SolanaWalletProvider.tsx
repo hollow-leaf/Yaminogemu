@@ -15,7 +15,9 @@ type Props = {
 // Mainnet-beta is the actuall mainnet (as of writing)
 const endpoint = clusterApiUrl('testnet');
 
-const wallets = [new PhantomWalletAdapter()];
+const wallets = [new PhantomWalletAdapter(
+  
+)];
 
 export const SolanaWalletProvider: FC<Props> = ({ children }) => {
   return (

@@ -3,20 +3,35 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { LoginModal } from './loginModal'
-import { useWallet } from "@solana/wallet-adapter-react";
+import {
+  DynamicContextProvider,
+  DynamicWidget,
+  useIsLoggedIn,
+  Wallet,
+  useDynamicContext
+} from "@dynamic-labs/sdk-react-core";
+import { isSolanaWallet } from '@dynamic-labs/solana';
 
 export default function Hall() {
 
   const [isPlay, setIsPlay] = useState<boolean>(false)
   const [showBox, setShowBox] = useState<boolean>(false)
 
-  const wallet = useWallet()
-  const isLoggedIn = wallet.connected
+  const isLoggedIn = useIsLoggedIn()
+  const { primaryWallet } = useDynamicContext();
+
   const router = useRouter()
 
   function playHandler() {
     setIsPlay(true)
     if(isLoggedIn) {
+      if(primaryWallet != null) {
+        if(!isSolanaWallet(primaryWallet)) {
+            return
+        }
+      } else {
+        return
+      }
       router.replace('/waitingroom')
     } else {
       setShowBox(true)
@@ -26,6 +41,14 @@ export default function Hall() {
   useEffect(() => {
     console.log(isLoggedIn)
     if(isLoggedIn && isPlay) {
+      setIsPlay(false)
+      if(primaryWallet != null) {
+        if(!isSolanaWallet(primaryWallet)) {
+            return
+        }
+      } else {
+        return
+      }
       router.replace('/waitingroom')
     }
   }, [isLoggedIn])

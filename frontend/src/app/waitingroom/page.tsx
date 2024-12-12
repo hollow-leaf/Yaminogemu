@@ -5,13 +5,18 @@ import { cn, sleep } from '@/utils/strignfy'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { useWallet } from '@solana/wallet-adapter-react'
+import {
+  useIsLoggedIn,
+  useDynamicContext
+} from "@dynamic-labs/sdk-react-core";
+import { isSolanaWallet } from '@dynamic-labs/solana';
+import { PublicKey } from '@solana/web3.js'
 
 function Gaming() {
   const router = useRouter()
 
-  const wallet = useWallet()
-  const isLoggedIn = wallet.connected
+  const isLoggedIn = useIsLoggedIn()
+  const { primaryWallet } = useDynamicContext();
 
   const [userAddr, setUserAddr] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState<boolean>(false)
@@ -20,10 +25,19 @@ function Gaming() {
   const [gameId, setGameId] = useState<number>(-1)
 
   useEffect(() => {
-    if(!isLoggedIn || wallet.publicKey == null) {
-      router.replace('/')
+    if(isLoggedIn) {
+      if(primaryWallet != null) {
+        if(!isSolanaWallet(primaryWallet)) {
+          router.replace('/')
+        }
+        const fromKey = new PublicKey(primaryWallet.address); 
+        setUserAddr(fromKey.toBase58())
+      } else {
+        router.replace('/')
+      }
+      router.replace('/waitingroom')
     } else {
-      setUserAddr(wallet.publicKey.toString())
+      router.replace('/')
     }
   }, [])
 
@@ -34,6 +48,7 @@ function Gaming() {
 
   async function _matchRegister() {
     setIsWaiting(true)
+    console.log(userAddr)
     if (userAddr == null) {
       setIsWaiting(false)
       return
