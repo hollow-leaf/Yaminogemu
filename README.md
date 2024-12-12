@@ -6,7 +6,9 @@
 </div>
 
 ### Our contracts address and Demo link
-- Solana contract link:[2YacFff9ohCN71SJQCFbhrKUKXx1BhoHTFYWFWYqieZd](https://explorer.solana.com/address/2YacFff9ohCN71SJQCFbhrKUKXx1BhoHTFYWFWYqieZd?cluster=devnet)
+- Solana contract address:[2YacFff9ohCN71SJQCFbhrKUKXx1BhoHTFYWFWYqieZd](https://explorer.solana.com/address/2YacFff9ohCN71SJQCFbhrKUKXx1BhoHTFYWFWYqieZd?cluster=devnet)
+- Solana contract source code:[https://github.com/hollow-leaf/Yaminogemu/tree/main/contracts](https://github.com/hollow-leaf/Yaminogemu/tree/main/contracts)
+- Front-end connection contract methods:[https://github.com/hollow-leaf/Yaminogemu/blob/main/frontend/src/hooks/solanahook.tsx](https://github.com/hollow-leaf/Yaminogemu/blob/main/frontend/src/hooks/solanahook.tsx)
 - Demo video:
 
 ### Project Description
@@ -51,9 +53,9 @@ At the same time, Yaminogemu utilizes a serverless backend to create a game API 
 
 ### Project Structure
 
-- `frontend`: Next.js app with PWA and DynamicWallet for connect wallet
+- `frontend`: Next.js app with PWA and DynamicWallet & @Solana/web3.js for contract interaction.
 - `contracts`: Solana contract Rust environment
-- `serverless`: Cloudflare hono framework Nodejs API and D1 noSQL Database 
+- `serverless`: Cloudflare hono backend framework + D1 Database
 
 ### Team members
 - Software Architect(Full Stack): [Solo Lin](https://github.com/LinXJ1204)
