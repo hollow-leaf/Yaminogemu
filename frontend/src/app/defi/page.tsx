@@ -1,10 +1,10 @@
 'use client'
-import { useRouter } from 'next/navigation'
-import TokenRankings from './token-list'
-import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core'
+import { DynamicWidget, useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core'
+import DeFiStakingPage from './DeFiStaking'
 import { useEffect, useState } from 'react'
-import { isSolanaWallet } from '@dynamic-labs/solana-core'
+import { isSolanaWallet } from '@dynamic-labs/solana'
 import { PublicKey } from '@solana/web3.js'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const router = useRouter()
@@ -23,14 +23,14 @@ export default function Home() {
       } else {
         router.replace('/')
       }
-      router.replace('/token-list')
+      router.replace('/defi')
     } else {
       router.replace('/')
     }
   }, [])
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      {isLoggedIn && <TokenRankings />}
+      {isLoggedIn ? <DeFiStakingPage /> : <DynamicWidget />}
     </div>
   )
 }
