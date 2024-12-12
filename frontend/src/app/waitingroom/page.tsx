@@ -5,17 +5,41 @@ import { cn, sleep } from '@/utils/strignfy'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import {
+  useIsLoggedIn,
+  useDynamicContext
+} from "@dynamic-labs/sdk-react-core";
+import { isSolanaWallet } from '@dynamic-labs/solana';
+import { PublicKey } from '@solana/web3.js'
 
 function Gaming() {
   const router = useRouter()
 
-  const [userAddr, setUserAddr] = useState<string | null>(
-    '0x6F744A5737507F035c42872f6869203829F78E36'
-  )
+  const isLoggedIn = useIsLoggedIn()
+  const { primaryWallet } = useDynamicContext();
+
+  const [userAddr, setUserAddr] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState<boolean>(false)
   const [matchId, setMatchId] = useState<number>(-1)
   const [tokenType, setTokenType] = useState<string | null>('BONK')
   const [gameId, setGameId] = useState<number>(-1)
+
+  useEffect(() => {
+    if(isLoggedIn) {
+      if(primaryWallet != null) {
+        if(!isSolanaWallet(primaryWallet)) {
+          router.replace('/')
+        }
+        const fromKey = new PublicKey(primaryWallet.address); 
+        setUserAddr(fromKey.toBase58())
+      } else {
+        router.replace('/')
+      }
+      router.replace('/waitingroom')
+    } else {
+      router.replace('/')
+    }
+  }, [])
 
   useEffect(() => {
     if (gameId == -1) return
@@ -24,6 +48,7 @@ function Gaming() {
 
   async function _matchRegister() {
     setIsWaiting(true)
+    console.log(userAddr)
     if (userAddr == null) {
       setIsWaiting(false)
       return
@@ -65,10 +90,7 @@ function Gaming() {
   }
   return (
     <div
-      className="bg-white flex flex-col min-h-screen items-center p-4"
-      style={{
-        backgroundImage: 'linear-gradient(120deg, #EC692C 0%, #F4CF28 100%)'
-      }}
+      className="flex flex-col min-h-screen items-center p-4"
     >
       <div
         className={cn(
@@ -89,14 +111,14 @@ function Gaming() {
       </div>
       {!isWaiting && (
         <div>
-          <div className="rounded-xl bg-white/30 w-full min-h-[300px] p-4 mb-[24px] mt-[180px] drop-shadow-xl">
-            <div className="text-[48px] mb-[12px]">How to play?</div>
-            <div className="text-[36px] mb-[12px]">Step1:</div>
-            <div className="text-[32px] mb-[12px]">Pay memecoin</div>
-            <div className="text-[36px] mb-[12px]">Step2:</div>
-            <div className="text-[32px] mb-[12px]">Waiting for matching</div>
-            <div className="text-[36px] mb-[12px]">Step3:</div>
-            <div className="text-[32px] mb-[12px]">Win and earn Bonk!</div>
+          <div className="rounded-xl bg-white/30 w-full min-h-[300px] py-4 px-8 mb-[24px] mt-[180px] drop-shadow-xl">
+            <div className="text-[36px] mb-[12px]">How to play?</div>
+            <div className="text-[32px] mb-[12px]">Step1:</div>
+            <div className="text-[28px] mb-[12px]">Pay memecoin</div>
+            <div className="text-[32px] mb-[12px]">Step2:</div>
+            <div className="text-[28px] mb-[12px]">Waiting for matching</div>
+            <div className="text-[32px] mb-[12px]">Step3:</div>
+            <div className="text-[28px] mb-[12px]">Win and earn <span className='text-[#F4CF20]'>Bonk</span>!</div>
           </div>
           <div className="w-full flex items-end">
             <button

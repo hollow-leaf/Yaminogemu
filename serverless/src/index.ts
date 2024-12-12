@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { getUniqueRandomInts } from './utils'
 
 type Bindings = {
   yaminogemuKVM: KVNamespace
@@ -85,10 +86,10 @@ app.post('/match', async (c) => {
     return c.json({ "result": res0.success, "error": res0.error, "match_id": res0.meta.last_row_id })
   } else {
     const match = waitingList[0].results[0] as any
-
+    const quizs = getUniqueRandomInts(3, 0, 199)
     const new_game = await c.env.yaminogemuDB
     .prepare('INSERT INTO game (problem0_id, problem1_id, problem2_id, start_time, round, user1_score, user2_score) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(1, 2, 3, new Date().toISOString(), -1, 0, 0)
+    .bind(quizs[0], quizs[1], quizs[2], new Date().toISOString(), -1, 0, 0)
     .run()
     const game_id = new_game.meta.last_row_id
 
@@ -191,7 +192,7 @@ app.post('/game/answer', async (c) => {
     }
     const update_game = await c.env.yaminogemuDB
     .prepare('UPDATE game SET user1_state = ?, user1_score = ?, round = ?')
-    .bind(round + 1, isCorrect ? game['user1_state'] + 10 : game['user1_state'], game['user2_state'])
+    .bind(round + 1, isCorrect ? game['user1_score'] + 10 : game['user1_score'], game['user2_state'])
     .run()
     return c.json({ "result": update_game.success, "error": update_game.error, "game_id": game_id, "score": isCorrect ? game['user1_state'] + 10 : game['user1_state'], isCorrect: isCorrect })
   } else {
@@ -200,7 +201,7 @@ app.post('/game/answer', async (c) => {
     }
     const update_game = await c.env.yaminogemuDB
     .prepare('UPDATE game SET user2_state = ?, user2_score = ?, round = ?')
-    .bind(round + 1, isCorrect ? game['user2_state'] + 10 : game['user2_state'], game['user1_state'])
+    .bind(round + 1, isCorrect ? game['user2_score'] + 10 : game['user2_score'], game['user1_state'])
     .run()
     return c.json({ "result": update_game.success, "error": update_game.error, "game_id": game_id, "score": isCorrect ? game['user2_state'] + 10 : game['user2_state'], isCorrect: isCorrect })
   }
