@@ -149,7 +149,7 @@ export class SolanaTransactionService {
   }
 
   // Airdrop tokens
-  public async airdropToken(): Promise<string> {
+  public async airdropToken(mintPublicKey: string, escrowPublicKey: string): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -157,8 +157,8 @@ export class SolanaTransactionService {
       AnchorAirdropEscrowJson as AnchorAirdropEscrow,
       { connection }
     )
-    const mint = new PublicKey("Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG")
-    const escrow= new PublicKey("GSpuFKexnLiDoU5J29ZK5NK9TDtBiMwHSV33U4fb2Lza") 
+    const mint = new PublicKey(mintPublicKey)
+    const escrow= new PublicKey(escrowPublicKey) 
     const ownerKey = new PublicKey(this.primaryWallet!.address)
     const claimerAta = getAssociatedTokenAddressSync(mint, ownerKey, false, TOKEN_2022_PROGRAM_ID)
     const vault = getAssociatedTokenAddressSync(mint, escrow, true, TOKEN_2022_PROGRAM_ID)

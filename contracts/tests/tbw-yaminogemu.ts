@@ -197,7 +197,6 @@ describe("tbw_yaminogemu", () => {
   });
 
   it("Airdrop All Token", async () => {
-    let lamports = await getMinimumBalanceForRentExemptMint(connection);
     let tx = new Transaction();
     tx.instructions = [
       ...[

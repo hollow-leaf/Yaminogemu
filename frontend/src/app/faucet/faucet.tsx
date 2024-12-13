@@ -10,7 +10,7 @@ export default function FaucetPage() {
 
   const { primaryWallet } = useDynamicContext()
 
-  const handleAirdrop = async () => {
+  const handleAirdrop = async (mintPublicKey: string, escrowPublicKey: string) => {
     if (!primaryWallet) {
       console.error('Wallet not available')
       return
@@ -20,7 +20,7 @@ export default function FaucetPage() {
       primaryWallet as SolanaWallet
     )
     try {
-      const signature = await transaction.airdropToken()
+      const signature = await transaction.airdropToken(mintPublicKey, escrowPublicKey)
       const explorerTx = `https://explorer.solana.com/tx/${signature}?cluster=devnet`
       Swal.fire({
         icon: 'success',
@@ -43,11 +43,11 @@ export default function FaucetPage() {
 
 
   const tokens = [
-    { symbol: 'Bonk'},
-    { symbol: 'MemeDoge'},
-    { symbol: 'OPOZ'},
-    { symbol: 'OPOS'},
-    { symbol: 'Pepe'}
+    { symbol: 'Bonk', mintPublicKey: "Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG", escrowPublicKey: "GSpuFKexnLiDoU5J29ZK5NK9TDtBiMwHSV33U4fb2Lza"},
+    { symbol: 'MemeDoge', mintPublicKey: "GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd", escrowPublicKey: "3YBD6r9jSRQR4gWjxQK8KmvCrcqFQ9cf9pqd1yuc8JBE"},
+    { symbol: 'Pepe', mintPublicKey: "2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc", escrowPublicKey: "5rkChpTZr38AQ2N4mQkwLDo2hKWAErH4g4z1yudLeFsx"},
+    { symbol: 'OPOZ', mintPublicKey: "7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa", escrowPublicKey: "4xs2GfdrXE4Qfh7ZZ8HbHX7KbfTym5jsZhMnine4ZiqY"},
+    { symbol: 'OPOS', mintPublicKey: "C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id", escrowPublicKey: "GyaScCp1Y1MrzTFU4mb49wy4S4FULPJ3z7rGQwmv8WxS"}
   ]
 
   return (
@@ -76,7 +76,7 @@ export default function FaucetPage() {
             </div>
             <div className="text-right">
               <button
-                onClick={() => handleAirdrop()}
+                onClick={() => handleAirdrop(token.mintPublicKey,token.escrowPublicKey)}
                 className="mt-2 bg-cyan-500 text-white py-1 px-4 rounded-full text-sm md:text-base hover:bg-cyan-600 transition-colors"
               >
                 Claim
