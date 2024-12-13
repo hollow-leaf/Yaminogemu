@@ -23,14 +23,12 @@ export default function Home() {
       } else {
         router.replace('/')
       }
-      router.replace('/defi')
-    } else {
-      router.replace('/')
+      router.replace('/faucet')
     }
   }, [])
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      {isLoggedIn ? <DeFiStakingPage /> : <DynamicWidget />}
+      {isLoggedIn ? <FaucetPage /> : <DynamicWidget />}
     </div>
   )
 }

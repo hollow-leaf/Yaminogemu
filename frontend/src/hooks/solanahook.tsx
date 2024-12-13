@@ -3,7 +3,7 @@ import { BN } from '@coral-xyz/anchor'
 import TbwYaminogemuJson from '@/idl/tbw_yaminogemu.json'
 import { TbwYaminogemu } from '@/idl/tbw_yaminogemu'
 import AnchorAirdropEscrowJson from "@/idl/anchor_airdrop_escrow.json";
-import { type AnchorAirdropEscrow} from "@idl/anchor_airdrop_escrow";
+import { AnchorAirdropEscrow } from '@/idl/anchor_airdrop_escrow';
 import {
   ISolana,
   isSolanaWallet,
