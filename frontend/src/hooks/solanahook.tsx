@@ -2,6 +2,8 @@ import * as anchor from '@coral-xyz/anchor'
 import { BN } from '@coral-xyz/anchor'
 import TbwYaminogemuJson from '@/idl/tbw_yaminogemu.json'
 import { TbwYaminogemu } from '@/idl/tbw_yaminogemu'
+import AnchorAirdropEscrowJson from "@/idl/anchor_airdrop_escrow.json";
+import { type AnchorAirdropEscrow} from "@idl/anchor_airdrop_escrow";
 import {
   ISolana,
   isSolanaWallet,
@@ -143,6 +145,54 @@ export class SolanaTransactionService {
       return signature
     } catch (error) {
       throw error
+    }
+  }
+
+  // Airdrop tokens
+  public async airdropToken(): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+
+    const anchorAirdropEscrowProgram = new anchor.Program<AnchorAirdropEscrow>(
+      AnchorAirdropEscrowJson as AnchorAirdropEscrow,
+      { connection }
+    )
+    const mint = new PublicKey("Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG")
+    const escrow= new PublicKey("GSpuFKexnLiDoU5J29ZK5NK9TDtBiMwHSV33U4fb2Lza") 
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+    const claimerAta = getAssociatedTokenAddressSync(mint, ownerKey, false, TOKEN_2022_PROGRAM_ID)
+    const vault = getAssociatedTokenAddressSync(mint, escrow, true, TOKEN_2022_PROGRAM_ID)
+    const frens = PublicKey.findProgramAddressSync(
+      [Buffer.from("frens"), ownerKey.toBuffer(), escrow.toBuffer()],
+      anchorAirdropEscrowProgram.programId
+    )[0];
+
+    const instructions = await anchorAirdropEscrowProgram.methods
+      .claim()
+      .accountsStrict({
+        claimer: ownerKey,
+        mint,
+        claimerAta,
+        escrow,
+        frens,
+        vault,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+      })
+      .instruction()
+
+    const transaction = new Transaction().add(instructions)
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
     }
   }
 
