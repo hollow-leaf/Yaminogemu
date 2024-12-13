@@ -112,7 +112,7 @@ Yaminogemu DeFi: Users can stake BONK to earn yields from the meme token liquidi
         <p>Staking BONK not only strengthens the Yaminogemu ecosystem but also provides users with a sustainable way to grow their wealth. It’s a win-win for both active players and long-term holders.</p>
     </div>
     <div style="flex: 1; padding: 10px; text-align: center;">
-        <img src="./frontend/public/defi-ratio.png" width="60%" height="auto"></img>
+        <img src="./frontend/public/defi-stake.png" width="60%" height="auto"></img>
     </div>
 </div>
 
