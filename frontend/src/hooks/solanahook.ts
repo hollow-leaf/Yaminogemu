@@ -882,7 +882,7 @@ export class SolanaTransactionService {
   ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
-
+    const maker = new PublicKey(_signer)
     const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
@@ -893,7 +893,7 @@ export class SolanaTransactionService {
 
     if(mintToken == null) return "DEAD"
 
-    const makerAta = getAssociatedTokenAddressSync(
+    const takerAta = getAssociatedTokenAddressSync(
       mintToken,
       ownerKey,
       false,
@@ -906,7 +906,7 @@ export class SolanaTransactionService {
     const escrow = PublicKey.findProgramAddressSync(
       [
         Buffer.from('escrow'),
-        ownerKey.toBuffer(),
+        maker.toBuffer(),
         task_id.toArrayLike(Buffer, 'le', 8)
       ],
       tbwYaminogemuProgram.programId
@@ -921,9 +921,9 @@ export class SolanaTransactionService {
       .take()
       .accountsStrict({
         taker: ownerKey, // 對手address
-        maker: _signer, // owner address
+        maker: maker, // owner address
         mintMeme: mintToken,
-        takerAtaT: makerAta,
+        takerAtaT: takerAta,
         memeRatio: memeRatio,
         escrow,
         vaultT: vault,
