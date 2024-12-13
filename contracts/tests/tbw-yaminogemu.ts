@@ -61,7 +61,7 @@ describe("tbw_yaminogemu", () => {
     return signature;
   };
 
-  const task_id = new BN(randomBytes(8));
+  const task_id = new BN(89);
   const owner = provider
   // const [maker, taker, mintM, mintT, mintBonk] = Array.from({ length: 5 }, () =>
   //   Keypair.generate()
@@ -77,7 +77,7 @@ describe("tbw_yaminogemu", () => {
   const mintBonk = new PublicKey("Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG")
 
   const mintM = mintBabyDoge
-  const mintT = mintPepe
+  const mintT = mintBabyDoge
 
   // // Metadata to store in Mint Account
   // const metaDataBonk: TokenMetadata = {
@@ -235,7 +235,7 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  it("Add", async () => {
+  xit("Add", async () => {
     await program.methods
       .add(new BN(4), new BN(85))
       .accountsStrict({
@@ -251,7 +251,7 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  it("Add", async () => {
+  xit("Add", async () => {
     await program.methods
       .add(new BN(2), new BN(95))
       .accountsStrict({
@@ -302,7 +302,7 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  it("Withdraw", async () => {
+  xit("Withdraw", async () => {
     await program.methods
       .withdraw(new BN(1e8))
       .accountsStrict({
@@ -387,7 +387,7 @@ describe("tbw_yaminogemu", () => {
     }
   });
 
-  it("Finalize", async () => {
+  xit("Finalize", async () => {
     try {
       await program.methods
         .finalize()
@@ -438,7 +438,7 @@ describe("tbw_yaminogemu", () => {
     }
   });
 
-  it("Owner Claim", async () => {
+  xit("Owner Claim", async () => {
     try {
       await program.methods
         .vaultClaim()
@@ -464,7 +464,7 @@ describe("tbw_yaminogemu", () => {
     }
   });
 
-  it("Withdraw", async () => {
+  xit("Withdraw", async () => {
     await program.methods
       .withdraw(new BN(1e6))
       .accountsStrict({

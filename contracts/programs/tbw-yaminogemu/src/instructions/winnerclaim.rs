@@ -37,7 +37,6 @@ pub struct WinnerClaim<'info> {
     #[account(
         mut,
         has_one = maker,
-        has_one = winner,
         seeds = [b"escrow", maker.key().as_ref(), escrow.task_id.to_le_bytes().as_ref()],
         bump = escrow.bump
     )]
@@ -79,7 +78,6 @@ pub struct WinnerClaim<'info> {
 
 impl WinnerClaim<'_> {
     pub fn winner_claim(&mut self) -> Result<()> {
-        // require!(self.escrow.filled, ErrorCode::NotFilledError);
         
         let vault_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",

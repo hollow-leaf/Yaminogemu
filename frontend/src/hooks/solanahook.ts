@@ -974,7 +974,7 @@ export class SolanaTransactionService {
       { connection }
     )
     const task_id = new BN(numberToBytes(_task_id))
-    const ownerKey = new PublicKey(this.primaryWallet!.address)
+    const ownerKey = new PublicKey("FSPvMFYQqPsYyhoLAtmj4fc6vNp5UWteviSPcKr9KnQ5")
 
     const winnerAtaWin = getAssociatedTokenAddressSync(mintWinner, winnerKey, false, this.tokenProgram)
     const winnerAtaBonk = getAssociatedTokenAddressSync(this.mintBonk, winnerKey, false, this.tokenProgram)
