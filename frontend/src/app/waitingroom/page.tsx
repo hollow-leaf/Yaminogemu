@@ -11,6 +11,9 @@ import {
 } from "@dynamic-labs/sdk-react-core";
 import { isSolanaWallet } from '@dynamic-labs/solana';
 import { PublicKey } from '@solana/web3.js'
+import { TokenSelection } from '@/components/tokenSelection'
+import { SolanaTransactionService } from '@/hooks/solanahook'
+import { SolanaWallet } from '@dynamic-labs/solana-core'
 
 function Gaming() {
   const router = useRouter()
@@ -21,8 +24,9 @@ function Gaming() {
   const [userAddr, setUserAddr] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState<boolean>(false)
   const [matchId, setMatchId] = useState<number>(-1)
-  const [tokenType, setTokenType] = useState<string | null>('BONK')
+  const [tokenType, setTokenType] = useState<"Doge" | "OPOZ" | "OPOS" | "Pepe">('Doge')
   const [gameId, setGameId] = useState<number>(-1)
+  const [tokenListModal, setTokenListModal] = useState<boolean>(false)
 
   useEffect(() => {
     if(isLoggedIn) {
@@ -43,11 +47,12 @@ function Gaming() {
 
   useEffect(() => {
     if (gameId == -1) return
-    router.replace(`/gaming?game_id=${gameId}`)
+    router.replace(`/gaming?game_id=${gameId}&tokentype=${tokenType}`)
   }, [gameId])
 
   async function _matchRegister() {
     setIsWaiting(true)
+    setTokenListModal(false)
     console.log(userAddr)
     if (userAddr == null) {
       setIsWaiting(false)
@@ -100,8 +105,8 @@ function Gaming() {
       >
         <Image
           src="/a28128d9ff7c49c9ad33ee2f626fda40.png"
-          width={150}
-          height={150}
+          width={100}
+          height={100}
           alt="Picture of the author"
           className="rounded-full"
         />
@@ -111,7 +116,7 @@ function Gaming() {
       </div>
       {!isWaiting && (
         <div>
-          <div className="rounded-xl bg-white/30 w-full min-h-[300px] py-4 px-8 mb-[24px] mt-[180px] drop-shadow-xl">
+          <div className="rounded-xl bg-white/30 w-full min-h-[300px] py-4 px-8 mb-[24px] mt-[130px] drop-shadow-xl">
             <div className="text-[36px] mb-[12px]">How to play?</div>
             <div className="text-[32px] mb-[12px]">Step1:</div>
             <div className="text-[28px] mb-[12px]">Pay memecoin</div>
@@ -123,7 +128,7 @@ function Gaming() {
           <div className="w-full flex items-end">
             <button
               className="rounded-xl w-full text-2xl shadow px-4 py-2 bg-[#2C2D32] text-white"
-              onClick={_matchRegister}
+              onClick={() => { setTokenListModal(true) }}
               disabled={isWaiting}
             >
               Start
@@ -131,6 +136,7 @@ function Gaming() {
           </div>
         </div>
       )}
+      <TokenSelection showBox={tokenListModal} closed={() => { setTokenListModal(false) }} isLoading={false} tokenSelected={{ selectedToken: tokenType, setSelectedToken: setTokenType }} matchRegister={_matchRegister}/>
     </div>
   )
 }

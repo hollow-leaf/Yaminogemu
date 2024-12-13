@@ -19,6 +19,7 @@ import {
   getAssociatedTokenAddressSync
 } from '@solana/spl-token'
 import { randomBytes } from 'crypto'
+import { numberToBytes } from '@/utils/strignfy'
 
 export class SolanaTransactionService {
   private mintBonk = new PublicKey(
@@ -50,6 +51,37 @@ export class SolanaTransactionService {
 
   private async getSigner(): Promise<ISolana> {
     return await this.primaryWallet!.getSigner()
+  }
+
+  public tokenTypeAddr(tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe"): PublicKey | null {
+    switch (tokenType) {
+        case "Doge":
+          return this.mintMemeDoge
+        case "OPOZ":
+          return this.mintOPOZ
+        case "OPOS":
+          return this.mintOPOS
+        case "Pepe":
+          return this.mintPepe
+        default:
+            return null
+    }
+  }
+
+  // Function to decide which function to call based on the token type
+  public async createToken(amount: number, taskId: number, tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe") {
+    switch (tokenType) {
+        case "Doge":
+          return this.createMemeDoge(amount, taskId);
+        case "OPOZ":
+          return this.createOPOZ(amount, taskId);
+        case "OPOS":
+          return this.createOPOS(amount, taskId);
+        case "Pepe":
+          return this.createPepe(amount, taskId);
+        default:
+            console.log("Invalid token type");
+    }
   }
 
   // Send SOL to another wallet
@@ -491,7 +523,7 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
+  // gaming: create function (user staking token then can play game.)
   public async createBonk(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
@@ -561,8 +593,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createMemeDoge(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createMemeDoge(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -570,7 +602,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaMemeDoge] = [ownerKey]
@@ -631,8 +663,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createOPOZ(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createOPOZ(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -640,7 +672,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaOPOZ] = [ownerKey]
@@ -701,8 +733,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createOPOS(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createOPOS(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -710,7 +742,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaOPOS] = [ownerKey]
@@ -771,8 +803,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createPepe(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createPepe(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -780,7 +812,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaPepe] = [ownerKey]
@@ -812,6 +844,7 @@ export class SolanaTransactionService {
       this.tokenProgram
     )
 
+    //escrow, maker, tokenType => caculate vault
     const instructions = await tbwYaminogemuProgram.methods
       .create(task_id, new BN(amount * 1e6))
       .accountsStrict({
@@ -841,8 +874,12 @@ export class SolanaTransactionService {
     }
   }
 
-  // match found and connect two player
-  public async Take(): Promise<string> {
+  // gaming: match found and connect two player
+  public async Take(
+    _task_id: number,
+    tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe",
+    _signer: string,
+  ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -850,23 +887,22 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const mintToken = this.tokenTypeAddr(tokenType)
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
-    const [makerAtaBonk] = [ownerKey]
-      .map((a) =>
-        [this.mintBonk].map((m) =>
-          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
-        )
-      )
-      .flat()
-    const [memeRatioBonk] = [this.mintBonk].map(
-      (a) =>
-        PublicKey.findProgramAddressSync(
-          [Buffer.from('meme'), a.toBuffer()],
-          tbwYaminogemuProgram.programId
-        )[0]
+    if(mintToken == null) return "DEAD"
+
+    const makerAta = getAssociatedTokenAddressSync(
+      mintToken,
+      ownerKey,
+      false,
+      this.tokenProgram
     )
+    const memeRatio = PublicKey.findProgramAddressSync(
+      [Buffer.from('meme'), mintToken.toBuffer()],
+      tbwYaminogemuProgram.programId
+    )[0]
     const escrow = PublicKey.findProgramAddressSync(
       [
         Buffer.from('escrow'),
@@ -875,8 +911,8 @@ export class SolanaTransactionService {
       ],
       tbwYaminogemuProgram.programId
     )[0]
-    const vaultBonk = getAssociatedTokenAddressSync(
-      this.mintBonk,
+    const vault = getAssociatedTokenAddressSync(
+      mintToken,
       escrow,
       true,
       this.tokenProgram
@@ -884,13 +920,13 @@ export class SolanaTransactionService {
     const instructions = await tbwYaminogemuProgram.methods
       .take()
       .accountsStrict({
-        taker: 'new PublicKey(solana address)', // 對手address
+        taker: _signer, // 對手address
         maker: ownerKey, // owner address
-        mintMeme: this.mintBonk,
-        takerAtaT: makerAtaBonk,
-        memeRatio: memeRatioBonk,
+        mintMeme: mintToken,
+        takerAtaT: makerAta,
+        memeRatio: memeRatio,
         escrow,
-        vaultT: vaultBonk,
+        vaultT: vault,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram: this.tokenProgram,
         systemProgram: SystemProgram.programId
@@ -911,16 +947,25 @@ export class SolanaTransactionService {
     }
   }
 
-  // game winner claim rewards
-  public async CliamRewards(): Promise<string> {
+  // gaming: game winner claim rewards
+  public async CliamRewards(
+    _task_id: number,
+    _loserToken: "Doge" | "OPOZ" | "OPOS" | "Pepe",
+    _winnerToken: "Doge" | "OPOZ" | "OPOS" | "Pepe",
+    _loserAddr: string,
+    _winnerAddr: string,
+    _maker: string
+  ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
+
+    const winnerKey = new PublicKey(_winnerAddr)
 
     const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaBonk] = [ownerKey]
@@ -962,19 +1007,22 @@ export class SolanaTransactionService {
       this.tokenProgram
     )
 
+    
+    // maker addr, memeType, taskID, taker addr, memeType
+
     const instructions = await tbwYaminogemuProgram.methods
       .winnerClaim()
       .accountsStrict({
-        winner: 'winner publicKey',
-        maker: ownerKey,
-        owner: ownerKey,
-        mintBonk: this.mintBonk,
-        mintMeme: this.mintBonk,
-        mintWin: this.mintBonk,
-        ownership,
-        memeRatio: memeRatioBonk,
+        winner: winnerKey,
+        maker: new PublicKey(_maker), //require maker from origin
+        owner: ownerKey, // static addr
+        mintBonk: this.mintBonk, //static addr
+        mintMeme: this.tokenTypeAddr(_loserToken) as any, //require loser's memecoin
+        mintWin: this.mintBonk, //require
+        ownership, // static addr
+        memeRatio: memeRatioBonk, //loser's memecoin ratio 2
         escrow,
-        winnerAtaWin: makerAtaBonk,
+        winnerAtaWin: makerAtaBonk, //
         winnerAtaBonk: makerAtaBonk,
         vaultWin: vaultBonk,
         ownershipBonk,

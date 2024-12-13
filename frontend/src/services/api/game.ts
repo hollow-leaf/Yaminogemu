@@ -1,4 +1,4 @@
-import { Quiz } from '@/app/type';
+import { Quiz, Result } from '@/app/type';
 import { serverlessHost } from './config'
 
 export async function gamePrepare(
@@ -112,7 +112,7 @@ export async function gameAnswer(
 export async function gameResult(
   game_id: number
 ): Promise<{
-  result: null | unknown
+  result: null | {res1: Result}
   user1_score: number
   user2_score: number
 }> {

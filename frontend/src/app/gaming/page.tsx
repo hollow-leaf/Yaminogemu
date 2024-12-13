@@ -4,18 +4,21 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { gameAnswer, gamePrepare, gameQuiz, gameResult } from '@/services/api/game'
 import { cn, sleep } from '@/utils/strignfy'
 import Image from 'next/image'
-import { Quiz } from '../type'
+import { Quiz, Result } from '../type'
 import {
   useIsLoggedIn,
   useDynamicContext
 } from "@dynamic-labs/sdk-react-core";
 import { isSolanaWallet } from '@dynamic-labs/solana';
 import { PublicKey } from '@solana/web3.js'
+import { SolanaTransactionService } from '@/hooks/solanahook'
+import { SolanaWallet } from '@dynamic-labs/solana-core'
 
 function Gaming() {
   const router = useRouter()
   const params = useSearchParams()
   const game_id = params.get('game_id')
+  const tokenType = params.get('tokentype')
 
   const isLoggedIn = useIsLoggedIn()
   const { primaryWallet } = useDynamicContext();
@@ -28,6 +31,8 @@ function Gaming() {
   const [problemId, setProblemId] = useState<number>(-1)
   const [isEnd, setIsEnd] = useState<boolean>(false)
   const [scores, setScores] = useState<{s0: number, s1: number}>({s0: 0, s1: 0})
+  const [userWallet, setUserWallet] = useState<SolanaTransactionService | null>(null)
+  const [finalResult, setFinalResult] = useState<Result | null>(null)
 
   useEffect(() => {
     if(isLoggedIn) {
@@ -37,6 +42,8 @@ function Gaming() {
         }
         const fromKey = new PublicKey(primaryWallet.address); 
         setUserAddr(fromKey.toBase58())
+        const _userWallet = new SolanaTransactionService(primaryWallet as SolanaWallet)
+        setUserWallet(_userWallet)
       } else {
         router.replace('/')
       }
@@ -55,6 +62,11 @@ function Gaming() {
     console.log(userAddr)
     if (!userAddr || !game_id) return
     const res0 = await gamePrepare(Number(game_id), userAddr)
+    if(res0.user == 1) {
+      const ress = await userWallet?.Take(Number(game_id), tokenType as any, userAddr)
+    } else {
+      const ress = await userWallet?.createToken(200, Number(game_id), tokenType as any)
+    }
     if (!res0.result) return
     setIsPreparing(true)
     setUser(res0.user)
@@ -98,6 +110,7 @@ function Gaming() {
 
   async function scoreUpdate() {
     const res = await gameResult(Number(game_id))
+    setFinalResult(res.result?.res1 as any)
     setScores({s0: res.user1_score, s1: res.user2_score})
   }
 
@@ -140,7 +153,7 @@ function Gaming() {
         </div>
       )}
       {round >= 0 && !isEnd && (
-        <div className=''>
+        <div className='w-full'>
           <div 
             className='bg-[#2C2D32] drop-shadow-2xl	text-[24px] rounded-[20px] p-4 w-full grid grid-cols-2 grid-flow-col mb-[36px]'
           >
@@ -153,21 +166,23 @@ function Gaming() {
               <div>{user == 1 ? scores.s0 : scores.s1}</div>
             </div>
           </div>
-          <div className="text-xl">{`Round: ${round}`}</div>
           {
             quiz && 
-            <div>
-              <div className='text-[32px] mb-[36px]'>
+            <div className=''>
+              <div 
+                className='text-[32px] p-4 rounded-t-[20px] bg-[#F29300]/90'
+              >
+                <div className="text-xl">{`Round: ${round}`}</div>
                 {quiz.q4}
               </div>
-              <div className='flex flex-col gap-y-[16px] text-[24px]'>
+              <div className='flex flex-col gap-y-[16px] text-[24px] glass rounded-b-[20px] p-4'>
                 <button
                   className={cn(
                     "rounded-[20px] w-full px-4 py-4",
-                    isPreparing ? quiz.answer == 0 ? "bg-[#33cc99]/60" : "bg-[#fa5c4f]/80" : "")
+                    isPreparing ? quiz.answer == 0 ? "bg-[#33cc99]/60" : "bg-[#fa5c4f]/80" : "bg-[#21A0A0]")
                   }
                   style={{
-                    "boxShadow": "rgba(0, 0, 0, .1) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0"
+                    "boxShadow": "rgba(0, 0, 0, .1) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0",
                   }}
                   onClick={() => submitAnswer(0, user)}
                   disabled={isPreparing}
@@ -177,7 +192,7 @@ function Gaming() {
                 <button
                   className={cn(
                     "rounded-[20px] w-full px-4 py-4",
-                    isPreparing ? quiz.answer == 1 ? "bg-[#33cc99]/60" : "bg-[#fa5c4f]/80" : "")
+                    isPreparing ? quiz.answer == 1 ? "bg-[#33cc99]/60" : "bg-[#fa5c4f]/80" : "bg-[#21A0A0]")
                   }
                   style={{
                     "boxShadow": "rgba(0, 0, 0, .1) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0"
@@ -190,7 +205,7 @@ function Gaming() {
                 <button
                   className={cn(
                     "rounded-[20px] w-full px-4 py-4",
-                    isPreparing ? quiz.answer == 2 ? "bg-[#33cc99]/60" : "bg-[#fa5c4f]/80" : "")
+                    isPreparing ? quiz.answer == 2 ? "bg-[#33cc99]/60" : "bg-[#fa5c4f]/80" : "bg-[#21A0A0]")
                   }
                   style={{
                     "boxShadow": "rgba(0, 0, 0, .1) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0"
@@ -208,10 +223,10 @@ function Gaming() {
       {isEnd && (
         <div>
           <div className='w-full text-center text-[72px] mb-[36px]'>
-            {user == 0 && scores.s0 > scores.s1 ? "Win!!" : "Lose QQ"}
+            {user == 0 && scores.s0 > scores.s1 ? "Win!!" : user == 0 ? "Lose QQ" : "Win!!"}
           </div>
           <Image
-            src={user == 0 && scores.s0 > scores.s1 ? "/winner.png" : "/loser.png"}
+            src={user == 0 && scores.s0 > scores.s1 ? "/winner.png" : user == 0 ? "/loser.png" : "/winner.png"}
             width={350}
             height={350}
             alt="Picture of the author"
@@ -227,6 +242,7 @@ function Gaming() {
               Claim prize
             </button>
             :
+            user == 0 ? 
             <button
               className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
               onClick={() => {
@@ -234,6 +250,29 @@ function Gaming() {
               }}
             >
               Leave
+            </button>
+            :
+            <button
+              className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
+              onClick={async () => {
+                console.log(finalResult)
+                if(finalResult == null) {
+                  router.replace("/")
+                }
+                if(finalResult) {
+                  const res = await userWallet?.CliamRewards(
+                    Number(game_id),
+                    scores.s0 > scores.s1 ? finalResult.user2_token : finalResult.user1_token,
+                    scores.s0 > scores.s1 ? finalResult.user1_token : finalResult.user2_token,
+                    scores.s0 > scores.s1 ? finalResult.user2_addr : finalResult.user1_addr,
+                    scores.s0 > scores.s1 ? finalResult.user1_addr : finalResult.user2_addr,
+                    finalResult.user1_addr
+                  )
+                }
+                //router.replace("/")
+              }}
+            >
+              Claim prize
             </button>
           }
         </div>
