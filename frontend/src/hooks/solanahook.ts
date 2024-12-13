@@ -1042,7 +1042,7 @@ export class SolanaTransactionService {
       const { signature } = await signer.signAndSendTransaction(transaction)
       return signature
     } catch (error) {
-      throw new Error(`Transaction failed: ${error}`)
+      return ""
     }
   }
 

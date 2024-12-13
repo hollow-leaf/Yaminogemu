@@ -223,35 +223,17 @@ function Gaming() {
       {isEnd && (
         <div>
           <div className='w-full text-center text-[72px] mb-[36px]'>
-            {user == 0 && scores.s0 > scores.s1 ? "Win!!" : user == 0 ? "Lose QQ" : "Win!!"}
+            {scores.s0 > scores.s1 ? user == 0 ? "Win!" : "Lose QQ" : user == 1 ? "Win!" : "Lose QQ"}
           </div>
           <Image
-            src={user == 0 && scores.s0 > scores.s1 ? "/winner.png" : user == 0 ? "/loser.png" : "/winner.png"}
+            src={scores.s0 > scores.s1 ? user == 0 ? "/winner.png" : "/loser.png" : user == 1 ? "/winner.png" : "/loser.png"}
             width={350}
             height={350}
             alt="Picture of the author"
             className="rounded-[20px] my-10"
           />
-          {user == 0 && scores.s0 > scores.s1 ? 
-            <button
-              className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
-              onClick={() => {
-                router.replace("/")
-              }}
-            >
-              Claim prize
-            </button>
-            :
-            user == 0 ? 
-            <button
-              className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
-              onClick={() => {
-                router.replace("/")
-              }}
-            >
-              Leave
-            </button>
-            :
+          {scores.s0 > scores.s1 ? 
+            user == 0 ?
             <button
               className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
               onClick={async () => {
@@ -269,10 +251,52 @@ function Gaming() {
                     finalResult.user1_addr
                   )
                 }
-                //router.replace("/")
+                router.replace("/")
               }}
             >
               Claim prize
+            </button>
+            :
+            <button
+              className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
+              onClick={() => {
+                router.replace("/")
+              }}
+            >
+              Leave
+            </button>
+            :
+            user == 1 ?
+            <button
+              className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
+              onClick={async () => {
+                console.log(finalResult)
+                if(finalResult == null) {
+                  router.replace("/")
+                }
+                if(finalResult) {
+                  const res = await userWallet?.CliamRewards(
+                    Number(game_id),
+                    scores.s0 > scores.s1 ? finalResult.user2_token : finalResult.user1_token,
+                    scores.s0 > scores.s1 ? finalResult.user1_token : finalResult.user2_token,
+                    scores.s0 > scores.s1 ? finalResult.user2_addr : finalResult.user1_addr,
+                    scores.s0 > scores.s1 ? finalResult.user1_addr : finalResult.user2_addr,
+                    finalResult.user1_addr
+                  )
+                }
+                router.replace("/")
+              }}
+            >
+              Claim prize
+            </button>
+            :
+            <button
+              className={cn("rounded-xl w-full text-2xl shadow px-4 py-2 text-white", isPreparing ? "bg-[#2C2D32]/50" : "bg-[#2C2D32]")}
+              onClick={() => {
+                router.replace("/")
+              }}
+            >
+              Leave
             </button>
           }
         </div>
