@@ -55,32 +55,32 @@ export class SolanaTransactionService {
 
   public tokenTypeAddr(tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe"): PublicKey | null {
     switch (tokenType) {
-        case "Doge":
-          return this.mintMemeDoge
-        case "OPOZ":
-          return this.mintOPOZ
-        case "OPOS":
-          return this.mintOPOS
-        case "Pepe":
-          return this.mintPepe
-        default:
-            return null
+      case "Doge":
+        return this.mintMemeDoge
+      case "OPOZ":
+        return this.mintOPOZ
+      case "OPOS":
+        return this.mintOPOS
+      case "Pepe":
+        return this.mintPepe
+      default:
+        return null
     }
   }
 
   // Function to decide which function to call based on the token type
   public async createToken(amount: number, taskId: number, tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe") {
     switch (tokenType) {
-        case "Doge":
-          return this.createMemeDoge(amount, taskId);
-        case "OPOZ":
-          return this.createOPOZ(amount, taskId);
-        case "OPOS":
-          return this.createOPOS(amount, taskId);
-        case "Pepe":
-          return this.createPepe(amount, taskId);
-        default:
-            console.log("Invalid token type");
+      case "Doge":
+        return this.createMemeDoge(amount, taskId);
+      case "OPOZ":
+        return this.createOPOZ(amount, taskId);
+      case "OPOS":
+        return this.createOPOS(amount, taskId);
+      case "Pepe":
+        return this.createPepe(amount, taskId);
+      default:
+        console.log("Invalid token type");
     }
   }
 
@@ -891,7 +891,7 @@ export class SolanaTransactionService {
     const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
-    if(mintToken == null) return "DEAD"
+    if (mintToken == null) return "DEAD"
 
     const takerAta = getAssociatedTokenAddressSync(
       mintToken,
@@ -960,6 +960,12 @@ export class SolanaTransactionService {
     const signer = await this.getSigner()
 
     const winnerKey = new PublicKey(_winnerAddr)
+    
+    const mintWinner = this.tokenTypeAddr(_winnerToken)
+    const mintloser = this.tokenTypeAddr(_loserToken)
+    if (!mintWinner || !mintloser) {
+      throw new Error('Invalid winner or loser token type'); // Handle the null case appropriately
+    }
 
     const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
       TbwYaminogemuJson as TbwYaminogemu,
@@ -968,20 +974,12 @@ export class SolanaTransactionService {
     const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
-    const [makerAtaBonk] = [ownerKey]
-      .map((a) =>
-        [this.mintBonk].map((m) =>
-          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
-        )
-      )
-      .flat()
-    const [memeRatioBonk] = [this.mintBonk].map(
-      (a) =>
-        PublicKey.findProgramAddressSync(
-          [Buffer.from('meme'), a.toBuffer()],
-          tbwYaminogemuProgram.programId
-        )[0]
-    )
+    const winnerAtaWin = getAssociatedTokenAddressSync(mintWinner, winnerKey, false, this.tokenProgram)
+    const winnerAtaBonk = getAssociatedTokenAddressSync(this.mintBonk, winnerKey, false, this.tokenProgram)
+    const memeRatioLose = PublicKey.findProgramAddressSync(
+      [Buffer.from('meme'), mintloser.toBuffer()],
+      tbwYaminogemuProgram.programId
+    )[0]
     const escrow = PublicKey.findProgramAddressSync(
       [
         Buffer.from('escrow'),
@@ -994,8 +992,8 @@ export class SolanaTransactionService {
       [Buffer.from('tbw_yaminogemu')],
       tbwYaminogemuProgram.programId
     )[0]
-    const vaultBonk = getAssociatedTokenAddressSync(
-      this.mintBonk,
+    const vaultWin = getAssociatedTokenAddressSync(
+      mintWinner,
       escrow,
       true,
       this.tokenProgram
@@ -1007,7 +1005,7 @@ export class SolanaTransactionService {
       this.tokenProgram
     )
 
-    
+
     // maker addr, memeType, taskID, taker addr, memeType
 
     const instructions = await tbwYaminogemuProgram.methods
@@ -1017,14 +1015,14 @@ export class SolanaTransactionService {
         maker: new PublicKey(_maker), //require maker from origin
         owner: ownerKey, // static addr
         mintBonk: this.mintBonk, //static addr
-        mintMeme: this.tokenTypeAddr(_loserToken) as any, //require loser's memecoin
-        mintWin: this.mintBonk, //require
+        mintMeme: mintloser, //require loser's memecoin
+        mintWin: mintWinner, //require
         ownership, // static addr
-        memeRatio: memeRatioBonk, //loser's memecoin ratio 2
+        memeRatio: memeRatioLose, //loser's memecoin ratio 2
         escrow,
-        winnerAtaWin: makerAtaBonk, //
-        winnerAtaBonk: makerAtaBonk,
-        vaultWin: vaultBonk,
+        winnerAtaWin: winnerAtaWin, //
+        winnerAtaBonk: winnerAtaBonk,
+        vaultWin: vaultWin,
         ownershipBonk,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram: this.tokenProgram,
