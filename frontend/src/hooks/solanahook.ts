@@ -20,6 +20,8 @@ import {
 } from '@solana/spl-token'
 import { randomBytes } from 'crypto'
 import { numberToBytes } from '@/utils/strignfy'
+import { AnchorAirdropEscrow } from '@/idl/anchor_airdrop_escrow'
+import AnchorAirdropEscrowJson from '@/idl/anchor_airdrop_escrow.json'
 
 export class SolanaTransactionService {
   private mintBonk = new PublicKey(
@@ -1115,4 +1117,87 @@ export class SolanaTransactionService {
         return '0'
     }
   }
+
+    // Airdrop tokens
+    public async airdropToken(): Promise<string> {
+      const connection = await this.getConnection()
+      const signer = await this.getSigner()
+      const tokens = [
+        {
+          mintPublicKey: 'Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG',
+          escrowPublicKey: 'GSpuFKexnLiDoU5J29ZK5NK9TDtBiMwHSV33U4fb2Lza'
+        },
+        {
+          mintPublicKey: 'GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd',
+          escrowPublicKey: '3YBD6r9jSRQR4gWjxQK8KmvCrcqFQ9cf9pqd1yuc8JBE'
+        },
+        {
+          mintPublicKey: '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc',
+          escrowPublicKey: '5rkChpTZr38AQ2N4mQkwLDo2hKWAErH4g4z1yudLeFsx'
+        },
+        {
+          mintPublicKey: '7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa',
+          escrowPublicKey: '4xs2GfdrXE4Qfh7ZZ8HbHX7KbfTym5jsZhMnine4ZiqY'
+        },
+        {
+          mintPublicKey: 'C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id',
+          escrowPublicKey: 'GyaScCp1Y1MrzTFU4mb49wy4S4FULPJ3z7rGQwmv8WxS'
+        }
+      ]
+      const anchorAirdropEscrowProgram = new anchor.Program<AnchorAirdropEscrow>(
+        AnchorAirdropEscrowJson as AnchorAirdropEscrow,
+        { connection }
+      )
+      const transaction = new Transaction()
+      const ownerKey = new PublicKey(this.primaryWallet!.address)
+      for (const token of tokens) {
+        const mint = new PublicKey(token.mintPublicKey)
+        const escrow = new PublicKey(token.escrowPublicKey)
+        const claimerAta = getAssociatedTokenAddressSync(
+          mint,
+          ownerKey,
+          false,
+          TOKEN_2022_PROGRAM_ID
+        )
+        const vault = getAssociatedTokenAddressSync(
+          mint,
+          escrow,
+          true,
+          TOKEN_2022_PROGRAM_ID
+        )
+        const frens = PublicKey.findProgramAddressSync(
+          [Buffer.from('frens'), ownerKey.toBuffer(), escrow.toBuffer()],
+          anchorAirdropEscrowProgram.programId
+        )[0]
+      
+        const instructions = await anchorAirdropEscrowProgram.methods
+          .claim()
+          .accountsStrict({
+            claimer: ownerKey,
+            mint,
+            claimerAta,
+            escrow,
+            frens,
+            vault,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            systemProgram: SystemProgram.programId
+          })
+          .instruction()
+      
+        transaction.add(instructions)
+      }
+  
+      transaction.recentBlockhash = (
+        await connection.getLatestBlockhash()
+      ).blockhash
+      transaction.feePayer = ownerKey
+  
+      try {
+        const { signature } = await signer.signAndSendTransaction(transaction)
+        return signature
+      } catch (error) {
+        throw new Error(`Transaction failed: ${error}`)
+      }
+    }
 }
