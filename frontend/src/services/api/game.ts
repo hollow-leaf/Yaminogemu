@@ -4,7 +4,7 @@ import { serverlessHost } from './config'
 export async function gamePrepare(
   game_id: number,
   address: string
-): Promise<{ result: boolean; error: unknown; game_id: number; user: number }> {
+): Promise<{ result: boolean; error: unknown; game_id: number; user: number, op: string }> {
   const requestOptions = {
     method: 'POST',
     headers: {
@@ -26,7 +26,8 @@ export async function gamePrepare(
       result: false,
       error: 'Something wrong',
       game_id: game_id,
-      user: -1
+      user: -1,
+      op: ""
     }
   }
 }

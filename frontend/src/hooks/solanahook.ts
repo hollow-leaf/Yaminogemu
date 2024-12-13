@@ -920,8 +920,8 @@ export class SolanaTransactionService {
     const instructions = await tbwYaminogemuProgram.methods
       .take()
       .accountsStrict({
-        taker: _signer, // 對手address
-        maker: ownerKey, // owner address
+        taker: ownerKey, // 對手address
+        maker: _signer, // owner address
         mintMeme: mintToken,
         takerAtaT: makerAta,
         memeRatio: memeRatio,

@@ -63,7 +63,7 @@ function Gaming() {
     if (!userAddr || !game_id) return
     const res0 = await gamePrepare(Number(game_id), userAddr)
     if(res0.user == 1) {
-      const ress = await userWallet?.Take(Number(game_id), tokenType as any, userAddr)
+      const ress = await userWallet?.Take(Number(game_id), tokenType as any, res0.op)
     } else {
       const ress = await userWallet?.createToken(200, Number(game_id), tokenType as any)
     }
