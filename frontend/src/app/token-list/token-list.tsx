@@ -48,9 +48,9 @@ export default function TokenRankings() {
 
       {/* Footer */}
       <footer className="mt-8 text-center">
-        <Link href="/defi">
+        <Link href="/faucet">
           <button className="w-full bg-cyan-400 text-white py-3 md:py-4 rounded-full font-medium text-sm md:text-base hover:bg-cyan-500 transition-colors">
-            Stake Tokens
+            Get the Faucet
           </button>
         </Link>
       </footer>
