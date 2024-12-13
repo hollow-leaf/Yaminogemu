@@ -79,7 +79,8 @@ pub struct WinnerClaim<'info> {
 
 impl WinnerClaim<'_> {
     pub fn winner_claim(&mut self) -> Result<()> {
-        require!(self.escrow.filled, ErrorCode::NotFilledError);
+        // require!(self.escrow.filled, ErrorCode::NotFilledError);
+        
         let vault_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",
             self.maker.to_account_info().key.as_ref(),

@@ -19,8 +19,7 @@ import {
   getAssociatedTokenAddressSync
 } from '@solana/spl-token'
 import { randomBytes } from 'crypto'
-import { AnchorAirdropEscrow } from '@/idl/anchor_airdrop_escrow'
-import AnchorAirdropEscrowJSON from '@/idl/anchor_airdrop_escrow.json'
+import { numberToBytes } from '@/utils/strignfy'
 
 export class SolanaTransactionService {
   private mintBonk = new PublicKey(
@@ -52,6 +51,37 @@ export class SolanaTransactionService {
 
   private async getSigner(): Promise<ISolana> {
     return await this.primaryWallet!.getSigner()
+  }
+
+  public tokenTypeAddr(tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe"): PublicKey | null {
+    switch (tokenType) {
+      case "Doge":
+        return this.mintMemeDoge
+      case "OPOZ":
+        return this.mintOPOZ
+      case "OPOS":
+        return this.mintOPOS
+      case "Pepe":
+        return this.mintPepe
+      default:
+        return null
+    }
+  }
+
+  // Function to decide which function to call based on the token type
+  public async createToken(amount: number, taskId: number, tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe") {
+    switch (tokenType) {
+      case "Doge":
+        return this.createMemeDoge(amount, taskId);
+      case "OPOZ":
+        return this.createOPOZ(amount, taskId);
+      case "OPOS":
+        return this.createOPOS(amount, taskId);
+      case "Pepe":
+        return this.createPepe(amount, taskId);
+      default:
+        console.log("Invalid token type");
+    }
   }
 
   // Send SOL to another wallet
@@ -493,7 +523,7 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
+  // gaming: create function (user staking token then can play game.)
   public async createBonk(amount: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
@@ -563,8 +593,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createMemeDoge(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createMemeDoge(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -572,7 +602,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaMemeDoge] = [ownerKey]
@@ -633,8 +663,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createOPOZ(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createOPOZ(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -642,7 +672,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaOPOZ] = [ownerKey]
@@ -703,8 +733,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createOPOS(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createOPOS(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -712,7 +742,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaOPOS] = [ownerKey]
@@ -773,8 +803,8 @@ export class SolanaTransactionService {
     }
   }
 
-  // create function (user staking token then can play game.)
-  public async createPepe(amount: number): Promise<string> {
+  // gaming: create function (user staking token then can play game.)
+  public async createPepe(amount: number, _task_id: number): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -782,7 +812,7 @@ export class SolanaTransactionService {
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
     const [makerAtaPepe] = [ownerKey]
@@ -814,6 +844,7 @@ export class SolanaTransactionService {
       this.tokenProgram
     )
 
+    //escrow, maker, tokenType => caculate vault
     const instructions = await tbwYaminogemuProgram.methods
       .create(task_id, new BN(amount * 1e6))
       .accountsStrict({
@@ -843,42 +874,45 @@ export class SolanaTransactionService {
     }
   }
 
-  // match found and connect two player
-  public async Take(): Promise<string> {
+  // gaming: match found and connect two player
+  public async Take(
+    _task_id: number,
+    tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe",
+    _signer: string,
+  ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
-
+    const maker = new PublicKey(_signer)
     const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const mintToken = this.tokenTypeAddr(tokenType)
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
-    const [makerAtaBonk] = [ownerKey]
-      .map((a) =>
-        [this.mintBonk].map((m) =>
-          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
-        )
-      )
-      .flat()
-    const [memeRatioBonk] = [this.mintBonk].map(
-      (a) =>
-        PublicKey.findProgramAddressSync(
-          [Buffer.from('meme'), a.toBuffer()],
-          tbwYaminogemuProgram.programId
-        )[0]
+    if (mintToken == null) return "DEAD"
+
+    const takerAta = getAssociatedTokenAddressSync(
+      mintToken,
+      ownerKey,
+      false,
+      this.tokenProgram
     )
+    const memeRatio = PublicKey.findProgramAddressSync(
+      [Buffer.from('meme'), mintToken.toBuffer()],
+      tbwYaminogemuProgram.programId
+    )[0]
     const escrow = PublicKey.findProgramAddressSync(
       [
         Buffer.from('escrow'),
-        ownerKey.toBuffer(),
+        maker.toBuffer(),
         task_id.toArrayLike(Buffer, 'le', 8)
       ],
       tbwYaminogemuProgram.programId
     )[0]
-    const vaultBonk = getAssociatedTokenAddressSync(
-      this.mintBonk,
+    const vault = getAssociatedTokenAddressSync(
+      mintToken,
       escrow,
       true,
       this.tokenProgram
@@ -886,13 +920,13 @@ export class SolanaTransactionService {
     const instructions = await tbwYaminogemuProgram.methods
       .take()
       .accountsStrict({
-        taker: 'new PublicKey(solana address)', // 對手address
-        maker: ownerKey, // owner address
-        mintMeme: this.mintBonk,
-        takerAtaT: makerAtaBonk,
-        memeRatio: memeRatioBonk,
+        taker: ownerKey, // 對手address
+        maker: maker, // owner address
+        mintMeme: mintToken,
+        takerAtaT: takerAta,
+        memeRatio: memeRatio,
         escrow,
-        vaultT: vaultBonk,
+        vaultT: vault,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram: this.tokenProgram,
         systemProgram: SystemProgram.programId
@@ -913,32 +947,39 @@ export class SolanaTransactionService {
     }
   }
 
-  // game winner claim rewards
-  public async CliamRewards(): Promise<string> {
+  // gaming: game winner claim rewards
+  public async CliamRewards(
+    _task_id: number,
+    _loserToken: "Doge" | "OPOZ" | "OPOS" | "Pepe",
+    _winnerToken: "Doge" | "OPOZ" | "OPOS" | "Pepe",
+    _loserAddr: string,
+    _winnerAddr: string,
+    _maker: string
+  ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
+
+    const winnerKey = new PublicKey(_winnerAddr)
+    
+    const mintWinner = this.tokenTypeAddr(_winnerToken)
+    const mintloser = this.tokenTypeAddr(_loserToken)
+    if (!mintWinner || !mintloser) {
+      throw new Error('Invalid winner or loser token type'); // Handle the null case appropriately
+    }
 
     const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
       TbwYaminogemuJson as TbwYaminogemu,
       { connection }
     )
-    const task_id = new BN(randomBytes(8))
+    const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
-    const [makerAtaBonk] = [ownerKey]
-      .map((a) =>
-        [this.mintBonk].map((m) =>
-          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
-        )
-      )
-      .flat()
-    const [memeRatioBonk] = [this.mintBonk].map(
-      (a) =>
-        PublicKey.findProgramAddressSync(
-          [Buffer.from('meme'), a.toBuffer()],
-          tbwYaminogemuProgram.programId
-        )[0]
-    )
+    const winnerAtaWin = getAssociatedTokenAddressSync(mintWinner, winnerKey, false, this.tokenProgram)
+    const winnerAtaBonk = getAssociatedTokenAddressSync(this.mintBonk, winnerKey, false, this.tokenProgram)
+    const memeRatioLose = PublicKey.findProgramAddressSync(
+      [Buffer.from('meme'), mintloser.toBuffer()],
+      tbwYaminogemuProgram.programId
+    )[0]
     const escrow = PublicKey.findProgramAddressSync(
       [
         Buffer.from('escrow'),
@@ -951,8 +992,8 @@ export class SolanaTransactionService {
       [Buffer.from('tbw_yaminogemu')],
       tbwYaminogemuProgram.programId
     )[0]
-    const vaultBonk = getAssociatedTokenAddressSync(
-      this.mintBonk,
+    const vaultWin = getAssociatedTokenAddressSync(
+      mintWinner,
       escrow,
       true,
       this.tokenProgram
@@ -964,21 +1005,24 @@ export class SolanaTransactionService {
       this.tokenProgram
     )
 
+
+    // maker addr, memeType, taskID, taker addr, memeType
+
     const instructions = await tbwYaminogemuProgram.methods
       .winnerClaim()
       .accountsStrict({
-        winner: 'winner publicKey',
-        maker: ownerKey,
-        owner: ownerKey,
-        mintBonk: this.mintBonk,
-        mintMeme: this.mintBonk,
-        mintWin: this.mintBonk,
-        ownership,
-        memeRatio: memeRatioBonk,
+        winner: winnerKey,
+        maker: new PublicKey(_maker), //require maker from origin
+        owner: ownerKey, // static addr
+        mintBonk: this.mintBonk, //static addr
+        mintMeme: mintloser, //require loser's memecoin
+        mintWin: mintWinner, //require
+        ownership, // static addr
+        memeRatio: memeRatioLose, //loser's memecoin ratio 2
         escrow,
-        winnerAtaWin: makerAtaBonk,
-        winnerAtaBonk: makerAtaBonk,
-        vaultWin: vaultBonk,
+        winnerAtaWin: winnerAtaWin, //
+        winnerAtaBonk: winnerAtaBonk,
+        vaultWin: vaultWin,
         ownershipBonk,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram: this.tokenProgram,
@@ -996,7 +1040,7 @@ export class SolanaTransactionService {
       const { signature } = await signer.signAndSendTransaction(transaction)
       return signature
     } catch (error) {
-      throw new Error(`Transaction failed: ${error}`)
+      return ""
     }
   }
 
@@ -1069,89 +1113,6 @@ export class SolanaTransactionService {
         return info5.value.uiAmount.toString()
       default:
         return '0'
-    }
-  }
-
-   // Airdrop tokens
-   public async airdropToken(): Promise<string> {
-    const connection = await this.getConnection()
-    const signer = await this.getSigner()
-    const tokens = [
-      {
-        mintPublicKey: 'Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG',
-        escrowPublicKey: 'GSpuFKexnLiDoU5J29ZK5NK9TDtBiMwHSV33U4fb2Lza'
-      },
-      {
-        mintPublicKey: 'GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd',
-        escrowPublicKey: '3YBD6r9jSRQR4gWjxQK8KmvCrcqFQ9cf9pqd1yuc8JBE'
-      },
-      {
-        mintPublicKey: '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc',
-        escrowPublicKey: '5rkChpTZr38AQ2N4mQkwLDo2hKWAErH4g4z1yudLeFsx'
-      },
-      {
-        mintPublicKey: '7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa',
-        escrowPublicKey: '4xs2GfdrXE4Qfh7ZZ8HbHX7KbfTym5jsZhMnine4ZiqY'
-      },
-      {
-        mintPublicKey: 'C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id',
-        escrowPublicKey: 'GyaScCp1Y1MrzTFU4mb49wy4S4FULPJ3z7rGQwmv8WxS'
-      }
-    ]
-    const anchorAirdropEscrowProgram = new anchor.Program<AnchorAirdropEscrow>(
-      AnchorAirdropEscrowJSON as AnchorAirdropEscrow,
-      { connection }
-    )
-    const transaction = new Transaction()
-    const ownerKey = new PublicKey(this.primaryWallet!.address)
-    for (const token of tokens) {
-      const mint = new PublicKey(token.mintPublicKey)
-      const escrow = new PublicKey(token.escrowPublicKey)
-      const claimerAta = getAssociatedTokenAddressSync(
-        mint,
-        ownerKey,
-        false,
-        TOKEN_2022_PROGRAM_ID
-      )
-      const vault = getAssociatedTokenAddressSync(
-        mint,
-        escrow,
-        true,
-        TOKEN_2022_PROGRAM_ID
-      )
-      const frens = PublicKey.findProgramAddressSync(
-        [Buffer.from('frens'), ownerKey.toBuffer(), escrow.toBuffer()],
-        anchorAirdropEscrowProgram.programId
-      )[0]
-    
-      const instructions = await anchorAirdropEscrowProgram.methods
-        .claim()
-        .accountsStrict({
-          claimer: ownerKey,
-          mint,
-          claimerAta,
-          escrow,
-          frens,
-          vault,
-          tokenProgram: TOKEN_2022_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          systemProgram: SystemProgram.programId
-        })
-        .instruction()
-    
-      transaction.add(instructions)
-    }
-
-    transaction.recentBlockhash = (
-      await connection.getLatestBlockhash()
-    ).blockhash
-    transaction.feePayer = ownerKey
-
-    try {
-      const { signature } = await signer.signAndSendTransaction(transaction)
-      return signature
-    } catch (error) {
-      throw new Error(`Transaction failed: ${error}`)
     }
   }
 }

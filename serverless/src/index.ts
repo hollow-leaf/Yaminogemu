@@ -135,13 +135,13 @@ app.post('/game/prepare', async (c) => {
     .prepare('UPDATE game SET user1_state = ?, user1_addr = ? WHERE game_id = ?')
     .bind(0, user_addr, game_id)
     .run()
-    return c.json({ "result": update_match.success, "error": update_match.error, "game_id": game_id, "user": 0 })
+    return c.json({ "result": update_match.success, "error": update_match.error, "game_id": game_id, "user": 0, "op": "" })
   }else {
     const update_match = await c.env.yaminogemuDB
     .prepare('UPDATE game SET user2_state = ?, user2_addr = ?, round = ?, start_time = ? WHERE game_id = ?')
     .bind(0, user_addr, 0, new Date().toISOString(), game_id)
     .run()
-    return c.json({ "result": update_match.success, "error": update_match.error, "game_id": game_id, "user": 1 })
+    return c.json({ "result": update_match.success, "error": update_match.error, "game_id": game_id, "user": 1, "op": game['user1_addr'] })
   }
 })
 
