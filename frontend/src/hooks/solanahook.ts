@@ -543,20 +543,11 @@ export class SolanaTransactionService {
     const task_id = new BN(randomBytes(8))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
-    const [makerAtaBonk] = [ownerKey]
-      .map((a) =>
-        [this.mintBonk].map((m) =>
-          getAssociatedTokenAddressSync(m, a, false, this.tokenProgram)
-        )
-      )
-      .flat()
-    const [memeRatioBonk] = [this.mintBonk].map(
-      (a) =>
-        PublicKey.findProgramAddressSync(
-          [Buffer.from('meme'), a.toBuffer()],
-          tbwYaminogemuProgram.programId
-        )[0]
-    )
+    const makerAtaBonk = getAssociatedTokenAddressSync(this.mintBonk, ownerKey, false, this.tokenProgram)
+    const memeRatioBonk = PublicKey.findProgramAddressSync(
+      [Buffer.from('meme'), this.mintBonk.toBuffer()],
+      tbwYaminogemuProgram.programId
+    )[0]
     const escrow = PublicKey.findProgramAddressSync(
       [
         Buffer.from('escrow'),

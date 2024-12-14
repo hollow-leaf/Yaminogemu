@@ -6,7 +6,7 @@ use crate::error::ErrorCode;
 // use bonsol_interface::callback::handle_callback;
 // use bonsol_interface::instructions::InputRef;
 
-// const CAMPARE_IMAGE_ID: &str = "ec8b92b02509d174a1a07dbe228d40ea13ff4b4b71b84bdc690064dfea2b6f86";
+// const CAMPARE_IMAGE_ID: &str = "d4c336f198eef61912edf174879601737d411ccce5905f844aa1b0b755e5eaca";
 
 #[derive(Accounts)]
 pub struct Finalize<'info> {
