@@ -55,15 +55,17 @@ export class SolanaTransactionService {
     return await this.primaryWallet!.getSigner()
   }
 
-  public tokenTypeAddr(tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe"): PublicKey | null {
+  public tokenTypeAddr(
+    tokenType: 'Doge' | 'OPOZ' | 'OPOS' | 'Pepe'
+  ): PublicKey | null {
     switch (tokenType) {
-      case "Doge":
+      case 'Doge':
         return this.mintMemeDoge
-      case "OPOZ":
+      case 'OPOZ':
         return this.mintOPOZ
-      case "OPOS":
+      case 'OPOS':
         return this.mintOPOS
-      case "Pepe":
+      case 'Pepe':
         return this.mintPepe
       default:
         return null
@@ -71,18 +73,22 @@ export class SolanaTransactionService {
   }
 
   // Function to decide which function to call based on the token type
-  public async createToken(amount: number, taskId: number, tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe") {
+  public async createToken(
+    amount: number,
+    taskId: number,
+    tokenType: 'Doge' | 'OPOZ' | 'OPOS' | 'Pepe'
+  ) {
     switch (tokenType) {
-      case "Doge":
-        return this.createMemeDoge(amount, taskId);
-      case "OPOZ":
-        return this.createOPOZ(amount, taskId);
-      case "OPOS":
-        return this.createOPOS(amount, taskId);
-      case "Pepe":
-        return this.createPepe(amount, taskId);
+      case 'Doge':
+        return this.createMemeDoge(amount, taskId)
+      case 'OPOZ':
+        return this.createOPOZ(amount, taskId)
+      case 'OPOS':
+        return this.createOPOS(amount, taskId)
+      case 'Pepe':
+        return this.createPepe(amount, taskId)
       default:
-        console.log("Invalid token type");
+        console.log('Invalid token type')
     }
   }
 
@@ -596,7 +602,10 @@ export class SolanaTransactionService {
   }
 
   // gaming: create function (user staking token then can play game.)
-  public async createMemeDoge(amount: number, _task_id: number): Promise<string> {
+  public async createMemeDoge(
+    amount: number,
+    _task_id: number
+  ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
 
@@ -879,8 +888,8 @@ export class SolanaTransactionService {
   // gaming: match found and connect two player
   public async Take(
     _task_id: number,
-    tokenType: "Doge" | "OPOZ" | "OPOS" | "Pepe",
-    _signer: string,
+    tokenType: 'Doge' | 'OPOZ' | 'OPOS' | 'Pepe',
+    _signer: string
   ): Promise<string> {
     const connection = await this.getConnection()
     const signer = await this.getSigner()
@@ -893,7 +902,7 @@ export class SolanaTransactionService {
     const task_id = new BN(numberToBytes(_task_id))
     const ownerKey = new PublicKey(this.primaryWallet!.address)
 
-    if (mintToken == null) return "DEAD"
+    if (mintToken == null) return 'DEAD'
 
     const takerAta = getAssociatedTokenAddressSync(
       mintToken,
@@ -952,8 +961,8 @@ export class SolanaTransactionService {
   // gaming: game winner claim rewards
   public async CliamRewards(
     _task_id: number,
-    _loserToken: "Doge" | "OPOZ" | "OPOS" | "Pepe",
-    _winnerToken: "Doge" | "OPOZ" | "OPOS" | "Pepe",
+    _loserToken: 'Doge' | 'OPOZ' | 'OPOS' | 'Pepe',
+    _winnerToken: 'Doge' | 'OPOZ' | 'OPOS' | 'Pepe',
     _loserAddr: string,
     _winnerAddr: string,
     _maker: string
@@ -962,11 +971,11 @@ export class SolanaTransactionService {
     const signer = await this.getSigner()
 
     const winnerKey = new PublicKey(_winnerAddr)
-    
+
     const mintWinner = this.tokenTypeAddr(_winnerToken)
     const mintloser = this.tokenTypeAddr(_loserToken)
     if (!mintWinner || !mintloser) {
-      throw new Error('Invalid winner or loser token type'); // Handle the null case appropriately
+      throw new Error('Invalid winner or loser token type') // Handle the null case appropriately
     }
 
     const tbwYaminogemuProgram = new anchor.Program<TbwYaminogemu>(
@@ -974,10 +983,22 @@ export class SolanaTransactionService {
       { connection }
     )
     const task_id = new BN(numberToBytes(_task_id))
-    const ownerKey = new PublicKey("FSPvMFYQqPsYyhoLAtmj4fc6vNp5UWteviSPcKr9KnQ5")
+    const ownerKey = new PublicKey(
+      'FSPvMFYQqPsYyhoLAtmj4fc6vNp5UWteviSPcKr9KnQ5'
+    )
 
-    const winnerAtaWin = getAssociatedTokenAddressSync(mintWinner, winnerKey, false, this.tokenProgram)
-    const winnerAtaBonk = getAssociatedTokenAddressSync(this.mintBonk, winnerKey, false, this.tokenProgram)
+    const winnerAtaWin = getAssociatedTokenAddressSync(
+      mintWinner,
+      winnerKey,
+      false,
+      this.tokenProgram
+    )
+    const winnerAtaBonk = getAssociatedTokenAddressSync(
+      this.mintBonk,
+      winnerKey,
+      false,
+      this.tokenProgram
+    )
     const memeRatioLose = PublicKey.findProgramAddressSync(
       [Buffer.from('meme'), mintloser.toBuffer()],
       tbwYaminogemuProgram.programId
@@ -1006,7 +1027,6 @@ export class SolanaTransactionService {
       true,
       this.tokenProgram
     )
-
 
     // maker addr, memeType, taskID, taker addr, memeType
 
@@ -1042,7 +1062,7 @@ export class SolanaTransactionService {
       const { signature } = await signer.signAndSendTransaction(transaction)
       return signature
     } catch (error) {
-      return ""
+      return ''
     }
   }
 
@@ -1118,86 +1138,86 @@ export class SolanaTransactionService {
     }
   }
 
-    // Airdrop tokens
-    public async airdropToken(): Promise<string> {
-      const connection = await this.getConnection()
-      const signer = await this.getSigner()
-      const tokens = [
-        {
-          mintPublicKey: 'Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG',
-          escrowPublicKey: 'GSpuFKexnLiDoU5J29ZK5NK9TDtBiMwHSV33U4fb2Lza'
-        },
-        {
-          mintPublicKey: 'GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd',
-          escrowPublicKey: '3YBD6r9jSRQR4gWjxQK8KmvCrcqFQ9cf9pqd1yuc8JBE'
-        },
-        {
-          mintPublicKey: '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc',
-          escrowPublicKey: '5rkChpTZr38AQ2N4mQkwLDo2hKWAErH4g4z1yudLeFsx'
-        },
-        {
-          mintPublicKey: '7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa',
-          escrowPublicKey: '4xs2GfdrXE4Qfh7ZZ8HbHX7KbfTym5jsZhMnine4ZiqY'
-        },
-        {
-          mintPublicKey: 'C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id',
-          escrowPublicKey: 'GyaScCp1Y1MrzTFU4mb49wy4S4FULPJ3z7rGQwmv8WxS'
-        }
-      ]
-      const anchorAirdropEscrowProgram = new anchor.Program<AnchorAirdropEscrow>(
-        AnchorAirdropEscrowJson as AnchorAirdropEscrow,
-        { connection }
+  // Airdrop tokens
+  public async airdropToken(): Promise<string> {
+    const connection = await this.getConnection()
+    const signer = await this.getSigner()
+    const tokens = [
+      {
+        mintPublicKey: 'Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG',
+        escrowPublicKey: 'GSpuFKexnLiDoU5J29ZK5NK9TDtBiMwHSV33U4fb2Lza'
+      },
+      {
+        mintPublicKey: 'GLmfMYRAw5HEY4rS4DAxeyir8iUTqVcakmtgPvzwaDTd',
+        escrowPublicKey: '3YBD6r9jSRQR4gWjxQK8KmvCrcqFQ9cf9pqd1yuc8JBE'
+      },
+      {
+        mintPublicKey: '2gcSMoNpcVNrFdJJ9CqiMcP8HeszxisYiWsNdkDuMdDc',
+        escrowPublicKey: '5rkChpTZr38AQ2N4mQkwLDo2hKWAErH4g4z1yudLeFsx'
+      },
+      {
+        mintPublicKey: '7isYYx9nfsgW1xxDmDyhjw7jY7PS6jEr89y4G5iAPzNa',
+        escrowPublicKey: '4xs2GfdrXE4Qfh7ZZ8HbHX7KbfTym5jsZhMnine4ZiqY'
+      },
+      {
+        mintPublicKey: 'C1tkdFaP7HjKevK28V1hPR2Rf6B2qMmgrt7LasAun8id',
+        escrowPublicKey: 'GyaScCp1Y1MrzTFU4mb49wy4S4FULPJ3z7rGQwmv8WxS'
+      }
+    ]
+    const anchorAirdropEscrowProgram = new anchor.Program<AnchorAirdropEscrow>(
+      AnchorAirdropEscrowJson as AnchorAirdropEscrow,
+      { connection }
+    )
+    const transaction = new Transaction()
+    const ownerKey = new PublicKey(this.primaryWallet!.address)
+    for (const token of tokens) {
+      const mint = new PublicKey(token.mintPublicKey)
+      const escrow = new PublicKey(token.escrowPublicKey)
+      const claimerAta = getAssociatedTokenAddressSync(
+        mint,
+        ownerKey,
+        false,
+        TOKEN_2022_PROGRAM_ID
       )
-      const transaction = new Transaction()
-      const ownerKey = new PublicKey(this.primaryWallet!.address)
-      for (const token of tokens) {
-        const mint = new PublicKey(token.mintPublicKey)
-        const escrow = new PublicKey(token.escrowPublicKey)
-        const claimerAta = getAssociatedTokenAddressSync(
+      const vault = getAssociatedTokenAddressSync(
+        mint,
+        escrow,
+        true,
+        TOKEN_2022_PROGRAM_ID
+      )
+      const frens = PublicKey.findProgramAddressSync(
+        [Buffer.from('frens'), ownerKey.toBuffer(), escrow.toBuffer()],
+        anchorAirdropEscrowProgram.programId
+      )[0]
+
+      const instructions = await anchorAirdropEscrowProgram.methods
+        .claim()
+        .accountsStrict({
+          claimer: ownerKey,
           mint,
-          ownerKey,
-          false,
-          TOKEN_2022_PROGRAM_ID
-        )
-        const vault = getAssociatedTokenAddressSync(
-          mint,
+          claimerAta,
           escrow,
-          true,
-          TOKEN_2022_PROGRAM_ID
-        )
-        const frens = PublicKey.findProgramAddressSync(
-          [Buffer.from('frens'), ownerKey.toBuffer(), escrow.toBuffer()],
-          anchorAirdropEscrowProgram.programId
-        )[0]
-      
-        const instructions = await anchorAirdropEscrowProgram.methods
-          .claim()
-          .accountsStrict({
-            claimer: ownerKey,
-            mint,
-            claimerAta,
-            escrow,
-            frens,
-            vault,
-            tokenProgram: TOKEN_2022_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            systemProgram: SystemProgram.programId
-          })
-          .instruction()
-      
-        transaction.add(instructions)
-      }
-  
-      transaction.recentBlockhash = (
-        await connection.getLatestBlockhash()
-      ).blockhash
-      transaction.feePayer = ownerKey
-  
-      try {
-        const { signature } = await signer.signAndSendTransaction(transaction)
-        return signature
-      } catch (error) {
-        throw new Error(`Transaction failed: ${error}`)
-      }
+          frens,
+          vault,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId
+        })
+        .instruction()
+
+      transaction.add(instructions)
     }
+
+    transaction.recentBlockhash = (
+      await connection.getLatestBlockhash()
+    ).blockhash
+    transaction.feePayer = ownerKey
+
+    try {
+      const { signature } = await signer.signAndSendTransaction(transaction)
+      return signature
+    } catch (error) {
+      throw new Error(`Transaction failed: ${error}`)
+    }
+  }
 }

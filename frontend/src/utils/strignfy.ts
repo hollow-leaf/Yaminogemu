@@ -34,17 +34,17 @@ export function cn(...inputs: ClassValue[]) {
 
 export function numberToBytes(num: number): Uint8Array {
   // Create an ArrayBuffer with a size of 8 bytes (64 bits)
-  const buffer = new ArrayBuffer(8);
+  const buffer = new ArrayBuffer(8)
   // Create a DataView representing the buffer
-  const view = new DataView(buffer);
-  
+  const view = new DataView(buffer)
+
   // Set the 64-bit float at byte 0, assuming little-endian byte order
   // JavaScript uses 64-bit floating point as its number type
-  view.setFloat64(0, num, true); // The 'true' parameter indicates little endian
-  
+  view.setFloat64(0, num, true) // The 'true' parameter indicates little endian
+
   // Alternatively, if you need a 64-bit integer, you can use setBigInt64 if the number is an integer
   // view.setBigInt64(0, BigInt(num), true); // Uncomment this line for 64-bit integer
 
   // Create a Uint8Array from the ArrayBuffer to return
-  return new Uint8Array(buffer);
+  return new Uint8Array(buffer)
 }

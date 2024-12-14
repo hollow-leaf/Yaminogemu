@@ -1,10 +1,16 @@
-import { Quiz, Result } from '@/app/type';
+import { Quiz, Result } from '@/app/type'
 import { serverlessHost } from './config'
 
 export async function gamePrepare(
   game_id: number,
   address: string
-): Promise<{ result: boolean; error: unknown; game_id: number; user: number, op: string }> {
+): Promise<{
+  result: boolean
+  error: unknown
+  game_id: number
+  user: number
+  op: string
+}> {
   const requestOptions = {
     method: 'POST',
     headers: {
@@ -27,14 +33,12 @@ export async function gamePrepare(
       error: 'Something wrong',
       game_id: game_id,
       user: -1,
-      op: ""
+      op: ''
     }
   }
 }
 
-export async function gameQuiz(
-  game_id: number
-): Promise<{
+export async function gameQuiz(game_id: number): Promise<{
   result: boolean
   error: unknown
   game_id: number
@@ -110,10 +114,8 @@ export async function gameAnswer(
   }
 }
 
-export async function gameResult(
-  game_id: number
-): Promise<{
-  result: null | {res1: Result}
+export async function gameResult(game_id: number): Promise<{
+  result: null | { res1: Result }
   user1_score: number
   user2_score: number
 }> {

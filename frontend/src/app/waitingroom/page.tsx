@@ -5,11 +5,8 @@ import { cn, sleep } from '@/utils/strignfy'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import {
-  useIsLoggedIn,
-  useDynamicContext
-} from "@dynamic-labs/sdk-react-core";
-import { isSolanaWallet } from '@dynamic-labs/solana';
+import { useIsLoggedIn, useDynamicContext } from '@dynamic-labs/sdk-react-core'
+import { isSolanaWallet } from '@dynamic-labs/solana'
 import { PublicKey } from '@solana/web3.js'
 import { TokenSelection } from '@/components/tokenSelection'
 import { SolanaTransactionService } from '@/hooks/solanahook'
@@ -19,22 +16,24 @@ function Gaming() {
   const router = useRouter()
 
   const isLoggedIn = useIsLoggedIn()
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext()
 
   const [userAddr, setUserAddr] = useState<string | null>(null)
   const [isWaiting, setIsWaiting] = useState<boolean>(false)
   const [matchId, setMatchId] = useState<number>(-1)
-  const [tokenType, setTokenType] = useState<"Doge" | "OPOZ" | "OPOS" | "Pepe">('Doge')
+  const [tokenType, setTokenType] = useState<'Doge' | 'OPOZ' | 'OPOS' | 'Pepe'>(
+    'Doge'
+  )
   const [gameId, setGameId] = useState<number>(-1)
   const [tokenListModal, setTokenListModal] = useState<boolean>(false)
 
   useEffect(() => {
-    if(isLoggedIn) {
-      if(primaryWallet != null) {
-        if(!isSolanaWallet(primaryWallet)) {
+    if (isLoggedIn) {
+      if (primaryWallet != null) {
+        if (!isSolanaWallet(primaryWallet)) {
           router.replace('/')
         }
-        const fromKey = new PublicKey(primaryWallet.address); 
+        const fromKey = new PublicKey(primaryWallet.address)
         setUserAddr(fromKey.toBase58())
       } else {
         router.replace('/')
@@ -94,9 +93,7 @@ function Gaming() {
     }
   }
   return (
-    <div
-      className="flex flex-col min-h-screen items-center p-4"
-    >
+    <div className="flex flex-col min-h-screen items-center p-4">
       <div
         className={cn(
           'flex flex-col items-center absolute top-0 mx-4 transition-all ease-in-out duration-700',
@@ -123,12 +120,16 @@ function Gaming() {
             <div className="text-[32px] mb-[12px]">Step2:</div>
             <div className="text-[28px] mb-[12px]">Waiting for matching</div>
             <div className="text-[32px] mb-[12px]">Step3:</div>
-            <div className="text-[28px] mb-[12px]">Win and earn <span className='text-[#F4CF20]'>Bonk</span>!</div>
+            <div className="text-[28px] mb-[12px]">
+              Win and earn <span className="text-[#F4CF20]">Bonk</span>!
+            </div>
           </div>
           <div className="w-full flex items-end">
             <button
               className="rounded-xl w-full text-2xl shadow px-4 py-2 bg-[#2C2D32] text-white"
-              onClick={() => { setTokenListModal(true) }}
+              onClick={() => {
+                setTokenListModal(true)
+              }}
               disabled={isWaiting}
             >
               Start
@@ -136,7 +137,18 @@ function Gaming() {
           </div>
         </div>
       )}
-      <TokenSelection showBox={tokenListModal} closed={() => { setTokenListModal(false) }} isLoading={false} tokenSelected={{ selectedToken: tokenType, setSelectedToken: setTokenType }} matchRegister={_matchRegister}/>
+      <TokenSelection
+        showBox={tokenListModal}
+        closed={() => {
+          setTokenListModal(false)
+        }}
+        isLoading={false}
+        tokenSelected={{
+          selectedToken: tokenType,
+          setSelectedToken: setTokenType
+        }}
+        matchRegister={_matchRegister}
+      />
     </div>
   )
 }

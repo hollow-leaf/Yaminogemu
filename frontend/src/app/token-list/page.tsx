@@ -9,16 +9,16 @@ import { PublicKey } from '@solana/web3.js'
 export default function Home() {
   const router = useRouter()
   const isLoggedIn = useIsLoggedIn()
-  const { primaryWallet } = useDynamicContext();
+  const { primaryWallet } = useDynamicContext()
   const [userAddr, setUserAddr] = useState<string | null>(null)
 
   useEffect(() => {
-    if(isLoggedIn) {
-      if(primaryWallet != null) {
-        if(!isSolanaWallet(primaryWallet)) {
+    if (isLoggedIn) {
+      if (primaryWallet != null) {
+        if (!isSolanaWallet(primaryWallet)) {
           router.replace('/')
         }
-        const fromKey = new PublicKey(primaryWallet.address); 
+        const fromKey = new PublicKey(primaryWallet.address)
         setUserAddr(fromKey.toBase58())
       } else {
         router.replace('/')
