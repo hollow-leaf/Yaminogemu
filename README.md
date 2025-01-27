@@ -10,7 +10,7 @@
 - Solana contract source code:[https://github.com/hollow-leaf/Yaminogemu/tree/main/contracts](https://github.com/hollow-leaf/Yaminogemu/tree/main/contracts)
 - Front-end connection contract methods:[https://github.com/hollow-leaf/Yaminogemu/blob/main/frontend/src/hooks/solanahook.tsx](https://github.com/hollow-leaf/Yaminogemu/blob/main/frontend/src/hooks/solanahook.tsx)
 - Bonsol image id : "d4c336f198eef61912edf174879601737d411ccce5905f844aa1b0b755e5eaca",
-- Demo video:
+- Demo video:[https://www.youtube.com/shorts/cVRBoSA7kPo](https://www.youtube.com/shorts/cVRBoSA7kPo)
 
 # Description
 
